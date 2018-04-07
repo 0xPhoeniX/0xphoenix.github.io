@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>https://0xphoenix.github.io/tools/portable-traffic-capture/</loc>
+    <lastmod>2018-04-01T18:52:01-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/challenges/flare/flareon_2014_1/</loc>
+    <lastmod>2014-09-23T18:52:01-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/challenges/flare/flareon_2014_2/</loc>
+    <lastmod>2014-09-23T18:52:01-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/challenges/flare/flareon_2014_3/</loc>
+    <lastmod>2014-09-23T18:52:01-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/challenges/flare/flareon_2014_4/</loc>
+    <lastmod>2014-09-23T18:52:01-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/challenges/flare/flareon_2014_5/</loc>
+    <lastmod>2014-09-23T18:52:01-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/challenges/flare/flareon_2014_6/</loc>
+    <lastmod>2014-09-23T18:52:01-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/reversing/necurs_study/</loc>
+    <lastmod>2014-07-22T18:52:01-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/reversing/cpu_emulation_for_malware_analysis/</loc>
+    <lastmod>2012-12-28T18:52:01-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/reversing/banker_challenge_static/</loc>
+    <lastmod>2012-10-07T18:52:01-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/reversing/banker_challenge/</loc>
+    <lastmod>2012-08-01T18:52:01-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/tags/banker/</loc>
+    <lastmod>2012-08-01T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/tags/challenge/</loc>
+    <lastmod>2014-09-23T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/challenges/</loc>
+    <lastmod>2014-09-23T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/categories/challenges/</loc>
+    <lastmod>2014-09-23T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/tags/cpu-emulation/</loc>
+    <lastmod>2012-12-28T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/tags/dga/</loc>
+    <lastmod>2012-08-01T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/tags/exploitation/</loc>
+    <lastmod>2014-07-22T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/tags/flare-on/</loc>
+    <lastmod>2014-09-23T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/tags/iot/</loc>
+    <lastmod>2018-04-01T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/tags/malware-analysis/</loc>
+    <lastmod>2014-07-22T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/tags/malware-reuse/</loc>
+    <lastmod>2012-12-28T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/tags/memory-analysis/</loc>
+    <lastmod>2012-10-07T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/tags/mobile/</loc>
+    <lastmod>2018-04-01T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/tags/necurs/</loc>
+    <lastmod>2014-07-22T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/tags/privilege-escalation/</loc>
+    <lastmod>2014-07-22T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/tags/raspi/</loc>
+    <lastmod>2018-04-01T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/tags/reversing/</loc>
+    <lastmod>2014-09-23T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/categories/reversing/</loc>
+    <lastmod>2014-07-22T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/reversing/</loc>
+    <lastmod>2014-07-22T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/tags/ssl-stripping/</loc>
+    <lastmod>2018-04-01T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/tags/static-analysis/</loc>
+    <lastmod>2012-10-07T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/tags/</loc>
+    <lastmod>2012-08-01T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/tools/</loc>
+    <lastmod>2018-04-01T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/categories/tools/</loc>
+    <lastmod>2018-04-01T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/tags/volatility/</loc>
+    <lastmod>2012-10-07T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/tags/wifi-monitor/</loc>
+    <lastmod>2018-04-01T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://0xphoenix.github.io/</loc>
+    <lastmod>2018-04-01T18:52:01-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+</urlset>

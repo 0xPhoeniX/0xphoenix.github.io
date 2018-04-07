@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flare-On 2014 Chellage 5 // Yev&#39;s security notes</title>
+
+        <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+        <meta property="og:title" content="Flare-On 2014 Chellage 5" />
+    <meta property="og:description" content="" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://0xphoenix.github.io/challenges/flare/flareon_2014_5/" />
+    
+
+    <link href="" rel="alternate" type="application/rss+xml" title="Yev&#39;s security notes" />
+    <link rel="shortcut icon" href="/favicon.png">
+
+    <link href="https://0xphoenix.github.iowebfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+    <link href="https://0xphoenix.github.iowebfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="https://0xphoenix.github.iocss/style.css">
+
+    <link href="http://gmpg.org/xfn/11" rel="profile">
+    
+    <meta name="generator" content="Hugo 0.36" />
+</head>
+
+
+<body>
+<div id="container">
+    <header id="header">
+    <div id="header-outer" class="outer">
+        <div id="header-inner" class="inner">
+            <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+            <a id="logo" class="logo-text" href="https://0xphoenix.github.io">Yev&#39;s security notes</a>
+            <nav id="main-nav">
+                
+                <a class="main-nav-link" href="/challenges/">Challenges</a>
+                
+                <a class="main-nav-link" href="/reversing/">Reversings</a>
+                
+                <a class="main-nav-link" href="/tools/">Tools</a>
+                
+            </nav>
+            <nav id="sub-nav">
+                <div id="search-form-wrap">
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+    <section id="main" class="outer">
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        <header class="article-header">
+            <h1 class="article-title" itemprop="name">Flare-On 2014 Chellage 5</h1>
+        </header>
+        
+        <div class="article-meta">
+            <a href="/challenges/flare/flareon_2014_5/" class="article-date">
+                <time datetime='2014-09-23T18:52:01.000-04:00' itemprop="datePublished">2014-09-23</time>
+            </a>
+            
+            
+            <div class="post-categories">
+                <div class="article-category">
+                    
+                    
+                    <a class="article-category-link" href="https://0xphoenix.github.io/categories/challenges">Challenges</a>
+                    
+                </div>
+            </div>
+            
+            
+        </div>
+        <div class="article-entry" itemprop="articleBody">
+            <p>This one starts the series of more challenging puzzles. The binary is actually a key logger with a twist, writing every pressed key into a log file.</p>
+
+<p><img src="/images/flare_ch5_start.png" alt="img" /></p>
+
+<p>Fig. 1</p>
+
+<p>It will try to install itself in your system under <code>%SystemRoot%</code> by disguising as <code>svchost.dll</code>. It will also add itself under <code>Run</code> key to ensure persistence (boring). The interesting things are waiting for us latter on.</p>
+
+<p>As I mentioned previously, this key-logger has a twist – each key press is monitored by <code>GetAsyncKeyState</code> which is running in the loop. Once the pressed key generated a character, it will be passed to a processing <em>switch</em> statement:</p>
+
+<p><img src="/images/flare_ch5_switch.png" alt="img" /></p>
+
+<p>Fig. 2</p>
+
+<p>The twist here is that the “secret” message was encoded by the means of flags that in the beginning all are initialized by <code>init_secret_flags</code>. Each flag represents the letter in the final “secret” message and the keys must be pressed in the particular order.</p>
+
+<p><img src="/images/flare_ch5_flags.png" alt="img" /></p>
+
+<p>Fig. 3</p>
+
+<p>If there is an error in the sequence, for example pressing <em>4</em>, everything will be reset (Fig.4 – 2) – <code>init_secret_flags</code>called again. On the other hand, <em>i</em> will be somewhere in the final “secret” message (Fig. 4 – 3) as the next flag is set to ‘on’ state.</p>
+
+<p><img src="/images/flare_ch5_switch_procs.png" alt="img" /></p>
+
+<p>Fig. 4</p>
+
+<p>The way to solve this puzzle is rather simple – just follow the flags in IDA (for example, using XRefs) where the particular flag is compared with <em>0</em> and write down the letter that is processes by that function. Pay attention, that the first flag is already set in <code>init_secret_flags</code>. Let’s walk the process for first 2 characters:</p>
+
+<ul>
+<li>find reference for first flag where it is compared with 0</li>
+<li>write down the character (‘l’)</li>
+<li>find reference for second flag where it is compared with 0</li>
+<li>write down the character (‘0’ – zero)</li>
+</ul>
+
+<p><img src="/images/flare_ch5_tracking.png" alt="img" /></p>
+
+<p>Fig. 5</p>
+
+<p>Once done, you should see the following:</p>
+
+<p><img src="/images/flare_ch5_done.png" alt="img" /></p>
+
+<p><center><strong>l0gging</strong>dot<strong>ur</strong>dot<strong>5tr0ke5</strong>at<strong>flare</strong>dash<strong>on</strong>dot<strong>com</strong></center></p>
+
+        </div>
+
+        
+        
+        
+
+        
+
+
+        
+        <footer class="article-footer">
+            <ul class="article-tag-list">
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/reversing">reversing
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/challenge">challenge
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/flare-on">Flare-On
+                    </a>
+                </li>
+                
+            </ul>
+        </footer>
+        
+    </div>
+    <nav id="article-nav">
+    
+    <a href="/challenges/flare/flareon_2014_4/" id="article-nav-newer" class="article-nav-link-wrap">
+        <div class="article-nav-title"><span>&lt;</span>&nbsp;
+            Flare-On 2014 Chellage 4
+        </div>
+    </a>
+    
+    
+    <a href="/challenges/flare/flareon_2014_6/" id="article-nav-older" class="article-nav-link-wrap">
+        <div class="article-nav-title">Flare-On 2014 Chellage 6&nbsp;<span>&gt;</span></div>
+    </a>
+    
+</nav>
+</article>
+
+        
+    </section>
+    <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Yev&#39;s security notes&nbsp;
+            Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> with theme <a href="https://github.com/carsonip/hugo-theme-minos">Minos</a>
+        </div>
+    </div>
+    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/tomorrow-night.min.css" integrity="sha256-2wL88NKUqvJi/ExflDzkzUumjUM73mcK2gBvBBeLvTk=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js" integrity="sha256-KbfTjB0WZ8vvXngdpJGY3Yp3xKk+tttbqClO11anCIU=" crossorigin="anonymous"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    
+    <script>
+        document.getElementById('main-nav-toggle').addEventListener('click', function () {
+            var header = document.getElementById('header');
+            if (header.classList.contains('mobile-on')) {
+                header.classList.remove('mobile-on');
+            } else {
+                header.classList.add('mobile-on');
+            }
+        });
+    </script>
+</footer>
+</div>
+</body>
+</html>

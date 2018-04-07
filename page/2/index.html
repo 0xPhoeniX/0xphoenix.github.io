@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Yev&#39;s security notes</title>
+
+        <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+        <meta property="og:title" content="Yev&#39;s security notes" />
+    <meta property="og:description" content="" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://0xphoenix.github.io/" />
+    
+
+    <link href="https://0xphoenix.github.io/index.xml" rel="alternate" type="application/rss+xml" title="Yev&#39;s security notes" />
+    <link rel="shortcut icon" href="/favicon.png">
+
+    <link href="https://0xphoenix.github.iowebfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+    <link href="https://0xphoenix.github.iowebfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="https://0xphoenix.github.iocss/style.css">
+
+    <link href="http://gmpg.org/xfn/11" rel="profile">
+    
+    <meta name="generator" content="Hugo 0.36" />
+</head>
+
+<body>
+<div id="container">
+    <header id="header">
+    <div id="header-outer" class="outer">
+        <div id="header-inner" class="inner">
+            <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+            <a id="logo" class="logo-text" href="https://0xphoenix.github.io">Yev&#39;s security notes</a>
+            <nav id="main-nav">
+                
+                <a class="main-nav-link" href="/challenges/">Challenges</a>
+                
+                <a class="main-nav-link" href="/reversing/">Reversings</a>
+                
+                <a class="main-nav-link" href="/tools/">Tools</a>
+                
+            </nav>
+            <nav id="sub-nav">
+                <div id="search-form-wrap">
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+    <section id="main" class="outer">
+        
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+            <div class="article-inner">
+                
+                
+                <header class="article-header">
+                    <h1 itemprop="name"><a class="article-title" href="/challenges/flare/flareon_2014_5/">Flare-On 2014 Chellage 5</a></h1>
+                </header>
+                
+                <div class="article-meta">
+                    <a href="/challenges/flare/flareon_2014_5/" class="article-date">
+                        <time datetime='2014-09-23T18:52:01.000-04:00' itemprop="datePublished">2014-09-23</time>
+                    </a>
+                    
+                    
+                    <div class="post-categories">
+                        <div class="article-category">
+                            
+                            
+                            <a class="article-category-link" href="https://0xphoenix.github.io/categories/challenges">Challenges</a>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+                <div class="article-entry" itemprop="articleBody">
+                    <p>
+                        <img src="/images/flareon.jpg"><br>
+                    This one starts the series of more challenging puzzles. The binary is actually a key logger with a twist, writing every pressed key into a log file.
+Fig. 1
+It will try to install itself in your system under %SystemRoot% by disguising as svchost.dll. It will also add itself under Run key to ensure persistence (boring). The interesting things are waiting for us latter on.
+As I mentioned previously, this key-logger has a twist – each key press is monitored by GetAsyncKeyState which is running in the loop.
+                    </p>
+                    <p class="article-more-link">
+                        <a href="/challenges/flare/flareon_2014_5/">Read More</a>
+                    </p>
+                </div>
+
+                
+                <footer class="article-footer">
+                    <ul class="article-tag-list">
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/reversing">reversing
+                            </a>
+                        </li>
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/challenge">challenge
+                            </a>
+                        </li>
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/flare-on">Flare-On
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </footer>
+                
+            </div>
+        </article>
+        
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+            <div class="article-inner">
+                
+                
+                <header class="article-header">
+                    <h1 itemprop="name"><a class="article-title" href="/challenges/flare/flareon_2014_6/">Flare-On 2014 Chellage 6</a></h1>
+                </header>
+                
+                <div class="article-meta">
+                    <a href="/challenges/flare/flareon_2014_6/" class="article-date">
+                        <time datetime='2014-09-23T18:52:01.000-04:00' itemprop="datePublished">2014-09-23</time>
+                    </a>
+                    
+                    
+                    <div class="post-categories">
+                        <div class="article-category">
+                            
+                            
+                            <a class="article-category-link" href="https://0xphoenix.github.io/categories/challenges">Challenges</a>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+                <div class="article-entry" itemprop="articleBody">
+                    <p>
+                        <img src="/images/flareon.jpg"><br>
+                    Challenge #6, probably the most toughest task among the series. We are blessed with 64 bit statically linked ELF file with stripped symbols. During the challenge we will be using the following tools:
+ radare2 IDA gdb  First things, first Let’s execute the file (in VM of course) and see what will be the output (if any):
+[test ~]$ ./c6 no  Not much, but it’s a start. This no will be our anchor and starting point in a minute.
+                    </p>
+                    <p class="article-more-link">
+                        <a href="/challenges/flare/flareon_2014_6/">Read More</a>
+                    </p>
+                </div>
+
+                
+                <footer class="article-footer">
+                    <ul class="article-tag-list">
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/reversing">reversing
+                            </a>
+                        </li>
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/challenge">challenge
+                            </a>
+                        </li>
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/flare-on">Flare-On
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </footer>
+                
+            </div>
+        </article>
+        
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+            <div class="article-inner">
+                
+                
+                <header class="article-header">
+                    <h1 itemprop="name"><a class="article-title" href="/reversing/necurs_study/">Necurs Kit Privilege Escalation Study</a></h1>
+                </header>
+                
+                <div class="article-meta">
+                    <a href="/reversing/necurs_study/" class="article-date">
+                        <time datetime='2014-07-22T18:52:01.000-04:00' itemprop="datePublished">2014-07-22</time>
+                    </a>
+                    
+                    
+                    <div class="post-categories">
+                        <div class="article-category">
+                            
+                            
+                            <a class="article-category-link" href="https://0xphoenix.github.io/categories/reversing">Reversing</a>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+                <div class="article-entry" itemprop="articleBody">
+                    <p>
+                        
+                    Recently there were several new posts (FSecure Post and Peter Ferrie) about updates to the Necurs malicious kit which in essence is based on the malicious driver with sole purpose to protect other malware from security products. The updated version is now shipped as an embedded self-contained launch-and-forget shellcode which will drop the appropriate driver according to the underlingg OS and on successful deployment will start immediate protection. The authors of the kit will supply the client several APIs that could be used to operate the driver.
+                    </p>
+                    <p class="article-more-link">
+                        <a href="/reversing/necurs_study/">Read More</a>
+                    </p>
+                </div>
+
+                
+                <footer class="article-footer">
+                    <ul class="article-tag-list">
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/malware-analysis">malware analysis
+                            </a>
+                        </li>
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/exploitation">exploitation
+                            </a>
+                        </li>
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/necurs">necurs
+                            </a>
+                        </li>
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/privilege-escalation">privilege escalation
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </footer>
+                
+            </div>
+        </article>
+        
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+            <div class="article-inner">
+                
+                
+                <header class="article-header">
+                    <h1 itemprop="name"><a class="article-title" href="/reversing/cpu_emulation_for_malware_analysis/">Malware reuse - cpu emulation for malware analysis</a></h1>
+                </header>
+                
+                <div class="article-meta">
+                    <a href="/reversing/cpu_emulation_for_malware_analysis/" class="article-date">
+                        <time datetime='2012-12-28T18:52:01.000-04:00' itemprop="datePublished">2012-12-28</time>
+                    </a>
+                    
+                    
+                    <div class="post-categories">
+                        <div class="article-category">
+                            
+                            
+                            <a class="article-category-link" href="https://0xphoenix.github.io/categories/reversing">Reversing</a>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+                <div class="article-entry" itemprop="articleBody">
+                    <p>
+                        <img src="/images/emulation_API_Hashing.png"><br>
+                    During any RE project, precise goal definition is one of the most important steps, without which the project will most likely fail. And I’m not even talking about how time consuming it could be, as frequently I can find the rabbit hole but I’m not really aware how deep it goes. The context for the whole post is RE of malicious software and here I’d like to talk a little bit about the way to put some of the work on the shoulders of the malware itself and still be able to concentrate on the main goals.
+                    </p>
+                    <p class="article-more-link">
+                        <a href="/reversing/cpu_emulation_for_malware_analysis/">Read More</a>
+                    </p>
+                </div>
+
+                
+                <footer class="article-footer">
+                    <ul class="article-tag-list">
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/malware-analysis">malware analysis
+                            </a>
+                        </li>
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/cpu-emulation">cpu emulation
+                            </a>
+                        </li>
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/malware-reuse">malware reuse
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </footer>
+                
+            </div>
+        </article>
+        
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+            <div class="article-inner">
+                
+                
+                <header class="article-header">
+                    <h1 itemprop="name"><a class="article-title" href="/reversing/banker_challenge_static/">Banker Challenge - another solution</a></h1>
+                </header>
+                
+                <div class="article-meta">
+                    <a href="/reversing/banker_challenge_static/" class="article-date">
+                        <time datetime='2012-10-07T18:52:01.000-04:00' itemprop="datePublished">2012-10-07</time>
+                    </a>
+                    
+                    
+                    <div class="post-categories">
+                        <div class="article-category">
+                            
+                            
+                            <a class="article-category-link" href="https://0xphoenix.github.io/categories/reversing">Reversing</a>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+                <div class="article-entry" itemprop="articleBody">
+                    <p>
+                        <img src="/images/bancker_challenge2_fig_ida_no_labes.png"><br>
+                    In my last post I presented a malware analysis solely based on the dynamic technique using OllyDbg. The goal was to recover the algorithm that was used for domain name generation of the C&amp;C server. Knowing, that there is no one best tool for everything but rather the best tool for a particular problem, I’ve decided to try and solve the same challenge with the help from static analysis tools, like IDA (free edition), while minimizing Olly involvement.
+                    </p>
+                    <p class="article-more-link">
+                        <a href="/reversing/banker_challenge_static/">Read More</a>
+                    </p>
+                </div>
+
+                
+                <footer class="article-footer">
+                    <ul class="article-tag-list">
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/malware-analysis">malware analysis
+                            </a>
+                        </li>
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/static-analysis">static analysis
+                            </a>
+                        </li>
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/memory-analysis">memory analysis
+                            </a>
+                        </li>
+                        
+                        <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/volatility">Volatility
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </footer>
+                
+            </div>
+        </article>
+        
+
+        
+
+<nav id="page-nav">
+    
+    <a href="/" rel="prev" class="extend prev">&laquo; Prev</a>
+    
+    
+    
+    <a href="/">1</a>
+    
+    
+    
+    <span class="page-number current">2</span>
+    
+    
+    
+    <a href="/page/3/">3</a>
+    
+    
+
+    
+    <a href="/page/3/" rel="next" class="extend next">Next &raquo;</a>
+    
+</nav>
+
+    </section>
+    <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Yev&#39;s security notes&nbsp;
+            Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> with theme <a href="https://github.com/carsonip/hugo-theme-minos">Minos</a>
+        </div>
+    </div>
+    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/tomorrow-night.min.css" integrity="sha256-2wL88NKUqvJi/ExflDzkzUumjUM73mcK2gBvBBeLvTk=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js" integrity="sha256-KbfTjB0WZ8vvXngdpJGY3Yp3xKk+tttbqClO11anCIU=" crossorigin="anonymous"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    
+    <script>
+        document.getElementById('main-nav-toggle').addEventListener('click', function () {
+            var header = document.getElementById('header');
+            if (header.classList.contains('mobile-on')) {
+                header.classList.remove('mobile-on');
+            } else {
+                header.classList.add('mobile-on');
+            }
+        });
+    </script>
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flare-On 2014 Chellage 1 // Yev&#39;s security notes</title>
+
+        <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+        <meta property="og:title" content="Flare-On 2014 Chellage 1" />
+    <meta property="og:description" content="" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://0xphoenix.github.io/challenges/flare/flareon_2014_1/" />
+    
+
+    <link href="" rel="alternate" type="application/rss+xml" title="Yev&#39;s security notes" />
+    <link rel="shortcut icon" href="/favicon.png">
+
+    <link href="https://0xphoenix.github.iowebfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+    <link href="https://0xphoenix.github.iowebfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="https://0xphoenix.github.iocss/style.css">
+
+    <link href="http://gmpg.org/xfn/11" rel="profile">
+    
+    <meta name="generator" content="Hugo 0.36" />
+</head>
+
+
+<body>
+<div id="container">
+    <header id="header">
+    <div id="header-outer" class="outer">
+        <div id="header-inner" class="inner">
+            <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+            <a id="logo" class="logo-text" href="https://0xphoenix.github.io">Yev&#39;s security notes</a>
+            <nav id="main-nav">
+                
+                <a class="main-nav-link" href="/challenges/">Challenges</a>
+                
+                <a class="main-nav-link" href="/reversing/">Reversings</a>
+                
+                <a class="main-nav-link" href="/tools/">Tools</a>
+                
+            </nav>
+            <nav id="sub-nav">
+                <div id="search-form-wrap">
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+    <section id="main" class="outer">
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        <header class="article-header">
+            <h1 class="article-title" itemprop="name">Flare-On 2014 Chellage 1</h1>
+        </header>
+        
+        <div class="article-meta">
+            <a href="/challenges/flare/flareon_2014_1/" class="article-date">
+                <time datetime='2014-09-23T18:52:01.000-04:00' itemprop="datePublished">2014-09-23</time>
+            </a>
+            
+            
+            <div class="post-categories">
+                <div class="article-category">
+                    
+                    
+                    <a class="article-category-link" href="https://0xphoenix.github.io/categories/challenges">Challenges</a>
+                    
+                </div>
+            </div>
+            
+            
+        </div>
+        <div class="article-entry" itemprop="articleBody">
+            <p>The binary can be downloaded from the original <a href="http://flare-on.com/">site</a>. Quick check shows that this is a .NET executable with some humor:</p>
+
+<p><img src="/images/flare_ch1_window.png" alt="" /></p>
+
+<p>Using very handy .NET decompiler, <a href="http://ilspy.net/">ILSpy</a>, let’s check the source of this funny thing with emphasis on the implementation of <em>Decode</em> event handler:</p>
+
+<pre><code class="language-c#">private void btnDecode_Click(object sender, EventArgs e)
+{
+  this.pbRoge.Image = Resources.bob_roge;
+  byte[] dat_secret = Resources.dat_secret;
+  string text = &quot;&quot;;
+  for (int i = 0; i &lt; dat_secret.Length; i++)
+  {
+      byte b = dat_secret[i];
+      text += (char)((b &gt;&gt; 4 | ((int)b &lt;&lt; 4 &amp; 240)) ^ 41);
+  }
+  text += &quot;\0&quot;;
+  string text2 = &quot;&quot;;
+  for (int j = 0; j &lt; text.Length; j += 2)
+  {
+      text2 += text[j + 1];
+      text2 += text[j];
+  }
+  string text3 = &quot;&quot;;
+  for (int k = 0; k &lt; text2.Length; k++)
+  {
+      char arg_B6_0 = text2[k];
+      text3 += (char)((byte)text2[k] ^ 102);
+  }
+  this.lbl_title.Text = text3;
+}
+</code></pre>
+
+<p>The evident thing here is the presence of <code>Resources.dat_secret</code> which holds the solution to the challenge. So, here we have <code>text</code>, <code>text2</code> and <code>text3</code> which will probably have the email I’m looking for. One can solve the challenge by writing some code which will decode the resource and reveal the secret. But, I say, if the decoder is already written in this case and in front of me, why no use it :–).</p>
+
+<p>I just add some <code>MessageBox</code> calls to the code and recompile it back. This will show me the variables!</p>
+
+<pre><code>private void btnDecode_Click(object sender, EventArgs e)
+{
+  ...
+
+  for (int i = 0; i &lt; dat_secret.Length; i++)
+  {
+      byte b = dat_secret[i];
+      text += (char)((b &gt;&gt; 4 | ((int)b &lt;&lt; 4 &amp; 240)) ^ 41);
+  }
+  text += &quot;\0&quot;;
+
+  MessageBox.Show(text);
+
+  ...
+
+  MessageBox.Show(text2);
+
+}
+</code></pre>
+
+<p>Here is the resulting email. I’ll leave the final discovery to you :–)</p>
+
+<p><img src="/images/flare_ch1_solution.png" alt="" /></p>
+
+        </div>
+
+        
+        
+        
+
+        
+
+
+        
+        <footer class="article-footer">
+            <ul class="article-tag-list">
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/reversing">reversing
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/challenge">challenge
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/flare-on">Flare-On
+                    </a>
+                </li>
+                
+            </ul>
+        </footer>
+        
+    </div>
+    <nav id="article-nav">
+    
+    <a href="/tools/portable-traffic-capture/" id="article-nav-newer" class="article-nav-link-wrap">
+        <div class="article-nav-title"><span>&lt;</span>&nbsp;
+            Portable Network Traffic Capture
+        </div>
+    </a>
+    
+    
+    <a href="/challenges/flare/flareon_2014_2/" id="article-nav-older" class="article-nav-link-wrap">
+        <div class="article-nav-title">Flare-On 2014 Chellage 2&nbsp;<span>&gt;</span></div>
+    </a>
+    
+</nav>
+</article>
+
+        
+    </section>
+    <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Yev&#39;s security notes&nbsp;
+            Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> with theme <a href="https://github.com/carsonip/hugo-theme-minos">Minos</a>
+        </div>
+    </div>
+    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/tomorrow-night.min.css" integrity="sha256-2wL88NKUqvJi/ExflDzkzUumjUM73mcK2gBvBBeLvTk=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js" integrity="sha256-KbfTjB0WZ8vvXngdpJGY3Yp3xKk+tttbqClO11anCIU=" crossorigin="anonymous"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    
+    <script>
+        document.getElementById('main-nav-toggle').addEventListener('click', function () {
+            var header = document.getElementById('header');
+            if (header.classList.contains('mobile-on')) {
+                header.classList.remove('mobile-on');
+            } else {
+                header.classList.add('mobile-on');
+            }
+        });
+    </script>
+</footer>
+</div>
+</body>
+</html>

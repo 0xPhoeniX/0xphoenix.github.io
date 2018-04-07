@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Necurs Kit Privilege Escalation Study // Yev&#39;s security notes</title>
+
+        <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+        <meta property="og:title" content="Necurs Kit Privilege Escalation Study" />
+    <meta property="og:description" content="" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://0xphoenix.github.io/reversing/necurs_study/" />
+    
+
+    <link href="" rel="alternate" type="application/rss+xml" title="Yev&#39;s security notes" />
+    <link rel="shortcut icon" href="/favicon.png">
+
+    <link href="https://0xphoenix.github.iowebfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+    <link href="https://0xphoenix.github.iowebfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="https://0xphoenix.github.iocss/style.css">
+
+    <link href="http://gmpg.org/xfn/11" rel="profile">
+    
+    <meta name="generator" content="Hugo 0.36" />
+</head>
+
+
+<body>
+<div id="container">
+    <header id="header">
+    <div id="header-outer" class="outer">
+        <div id="header-inner" class="inner">
+            <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+            <a id="logo" class="logo-text" href="https://0xphoenix.github.io">Yev&#39;s security notes</a>
+            <nav id="main-nav">
+                
+                <a class="main-nav-link" href="/challenges/">Challenges</a>
+                
+                <a class="main-nav-link" href="/reversing/">Reversings</a>
+                
+                <a class="main-nav-link" href="/tools/">Tools</a>
+                
+            </nav>
+            <nav id="sub-nav">
+                <div id="search-form-wrap">
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+    <section id="main" class="outer">
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        <header class="article-header">
+            <h1 class="article-title" itemprop="name">Necurs Kit Privilege Escalation Study</h1>
+        </header>
+        
+        <div class="article-meta">
+            <a href="/reversing/necurs_study/" class="article-date">
+                <time datetime='2014-07-22T18:52:01.000-04:00' itemprop="datePublished">2014-07-22</time>
+            </a>
+            
+            
+            <div class="post-categories">
+                <div class="article-category">
+                    
+                    
+                    <a class="article-category-link" href="https://0xphoenix.github.io/categories/reversing">Reversing</a>
+                    
+                </div>
+            </div>
+            
+            
+        </div>
+        <div class="article-entry" itemprop="articleBody">
+            
+
+<p>Recently there were several new posts (<a href="http://www.f-secure.com/weblog/archives/00002717.html">FSecure Post</a> and <a href="http://pferrie.host22.com/">Peter Ferrie</a>) about updates to the Necurs malicious kit which in essence is based on the malicious driver with sole purpose to protect other malware from security products. The updated version is now shipped as an embedded self-contained launch-and-forget shellcode which will drop the appropriate driver according to the underlingg OS and on successful deployment will start immediate protection. The authors of the kit will supply the client several APIs that could be used to operate the driver.</p>
+
+<p>I knew that for driver loading on OSs above Vista, it was using privilege escalation vulnerability. It was interesting to understand how that exploit was used in Necurs’ case and as I was unable to find a fine explanation, I studied it by myself . Here I present my findings for the matter.</p>
+
+<h3 id="deployment">Deployment</h3>
+
+<p>As already mentioned, <em>Necurs</em> operates as a 3rd party driver – meaning, the user will need <em>Admin</em> rights to actually use it. Being a 3rd-party product, it needs to operate on verity of Windows OSs:</p>
+
+<ul>
+<li>Windows XP – by default the logged-in user is already <em>Admin</em>, so no problem here.</li>
+<li>Vista and above – the user will probably have UAC enabled which will prevent driver loading.</li>
+</ul>
+
+<p>So, the solution for Vista and above was based on the <a href="http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-4398">CVE-2010-4398</a> local privilege escalation vulnerability. It’s nicely explained in several places – by the <a href="http://www.exploit-db.com/bypassing-uac-with-user-privilege-under-windows-vista7-mirror/">author</a> and <a href="http://stoned-vienna.com/html/index.php?page=advanced-analysis-of-the-2010-11-24-local-windows-kernel-exploit">Peter Kleissner</a>.</p>
+
+<h5 id="uac-by-pass">UAC By-Pass</h5>
+
+<p>The by-pass is based on changing the security token of the malicious process by the “powerful” one which is borrowed from the <code>system</code> process in kernel space. This task is achieved in the following way:</p>
+
+<ul>
+<li><strong>kernel APIs resolution</strong> – as the exploit shellcode will actually be executed in the kernel space, it will need the appropriate API addresses to do so. Those APIs are resolved by extracting the APIs’ RVAs from the <code>ntoskrnl.exe</code> file and finding the actual <code>ntoskrnl.exe</code> base address (using <code>ZwQuerySystemInformation</code>).</li>
+<li><strong>registry preparation</strong> – craft registry data in the way, that will trigger the <a href="http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-4398">CVE-2010-4398</a> exploit as explained in the original <a href="http://www.exploit-db.com/bypassing-uac-with-user-privilege-under-windows-vista7-mirror/">article</a> by calling <code>EnableEUDC</code>.</li>
+<li><strong>exploit shellcode execution</strong> – get security token (<code>PsReferencePrimaryToken</code>) from the initial system process (<code>PsInitialSystemProcess</code>) and replace the current process’s (<code>IoGetCurrentProcess</code>) token with the new one (Fig. 1). Once token replaced, the shellcode will return to the original execution flow.</li>
+</ul>
+
+<p><img src="/images/necurs_necurs_token_replace.png" alt="" />
+<center>Figure 1: Grant Administrator privileges to current process</center></p>
+
+<p>Multi-OS support was achieved by using predefined offsets to the<code>Token</code> member in the <code>EPROCESS</code> structure (Fig 2).</p>
+
+<p><img src="/images/necurs_necurs_token_offset.png" alt="" />
+<center>Figure 2: Multi-OS support</center></p>
+
+<h4 id="return-from-exploit-shellcode">Return from exploit shellcode</h4>
+
+<p>Once the exploitation was done, the exploit shellcode will try to return to the original execution flow, as if nothing has happened (in other words, <code>internal_func_b</code> finished its execution properly – see below). For the explanation, I’ll use arbitrary symbolic addresses to describe the following call stack and 32 bit shellcode version:</p>
+
+<p><center><img src="/images/necurs_stack.png" alt="" /></center></p>
+
+<p>To understand the trick, let’s look how <em>ESP</em> changes from the call <code>EnableEUDC</code> till the stack overflow at <code>RtlQueryRegistryValues</code>. The overflow will overwrite the return address of <code>internal_func_b</code> (for explanation please read <a href="http://stoned-vienna.com/html/index.php?page=advanced-analysis-of-the-2010-11-24-local-windows-kernel-exploit">here</a>). <em>ESP</em> undergoes the following changes and this “picture” of <em>ESP</em> is what exploit shellcode will see (Fig 3):</p>
+
+<p><center></p>
+
+<table>
+<thead>
+<tr>
+<th align="center"><strong>ESP address</strong></th>
+<th align="center"><strong>ESP pointed data</strong></th>
+<th align="center"><strong>Remarks</strong></th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="center">0x0</td>
+<td align="center">1</td>
+<td align="center">parameter for <code>EnableEUDC</code></td>
+</tr>
+
+<tr>
+<td align="center">0x4</td>
+<td align="center">0xae1efe</td>
+<td align="center">return after <code>EnableEUDC</code></td>
+</tr>
+
+<tr>
+<td align="center">0x8</td>
+<td align="center">shellcode EBP</td>
+<td align="center">EIP is currently in <code>GreEnableEUDC</code></td>
+</tr>
+
+<tr>
+<td align="center">0xC</td>
+<td align="center">param 1</td>
+<td align="center"></td>
+</tr>
+
+<tr>
+<td align="center">0x10</td>
+<td align="center">param 2</td>
+<td align="center"></td>
+</tr>
+
+<tr>
+<td align="center">0x14</td>
+<td align="center">0xbf81b8d0</td>
+<td align="center">return after call to <code>internal_func_a</code></td>
+</tr>
+
+<tr>
+<td align="center">0x18</td>
+<td align="center">internal_func_a EBP</td>
+<td align="center"></td>
+</tr>
+
+<tr>
+<td align="center">0x3C</td>
+<td align="center">local vars</td>
+<td align="center">local params in <code>internal_func_a</code></td>
+</tr>
+
+<tr>
+<td align="center">0x40</td>
+<td align="center">reg value</td>
+<td align="center"></td>
+</tr>
+
+<tr>
+<td align="center">0x44</td>
+<td align="center">reg value</td>
+<td align="center"></td>
+</tr>
+
+<tr>
+<td align="center">0x48</td>
+<td align="center">reg value</td>
+<td align="center">this is what exploit shellcode sees</td>
+</tr>
+</tbody>
+</table>
+
+<p></center></p>
+
+<p><img src="/images/necurs_shellcode_return.png" alt="" />
+<center>Figure 3: Return from exploit shellcode</center></p>
+
+<p>The <code>token_fix</code> global variable will fix the <em>ESP</em> in a such way, so it will point to the <code>internal_func_a stack</code> frame. Finally, the return address of <code>internal_func_a</code> is used to return to the original flow of execution (Fig 4).</p>
+
+<p><img src="/images/necurs_find_ret_address.png" alt="" />
+<center>Figure 4: Searching for return address</center></p>
+
+<p>Once found, the flow will land in <code>internal_func_a</code> (Fig 5).</p>
+
+<p><img src="/images/necurs_execution_continue.png" alt="" />
+<center>Figure 5: Execution after exploitation</center></p>
+
+<p>Now, the running process has <em>Administrator</em> account rights, so the only simple thing left is just to re-launch itself, drop and load the driver. Just to note, that on 64 bit systems, there are similar flow of events occur.</p>
+
+        </div>
+
+        
+        
+        <div class="article-toc" >
+            <h3>Contents</h3>
+            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#deployment">Deployment</a>
+<ul>
+<li>
+<ul>
+<li><a href="#uac-by-pass">UAC By-Pass</a></li>
+</ul></li>
+<li><a href="#return-from-exploit-shellcode">Return from exploit shellcode</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+        </div>
+        
+        
+
+        
+
+
+        
+        <footer class="article-footer">
+            <ul class="article-tag-list">
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/malware-analysis">malware analysis
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/exploitation">exploitation
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/necurs">necurs
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/privilege-escalation">privilege escalation
+                    </a>
+                </li>
+                
+            </ul>
+        </footer>
+        
+    </div>
+    <nav id="article-nav">
+    
+    <a href="/challenges/flare/flareon_2014_6/" id="article-nav-newer" class="article-nav-link-wrap">
+        <div class="article-nav-title"><span>&lt;</span>&nbsp;
+            Flare-On 2014 Chellage 6
+        </div>
+    </a>
+    
+    
+    <a href="/reversing/cpu_emulation_for_malware_analysis/" id="article-nav-older" class="article-nav-link-wrap">
+        <div class="article-nav-title">Malware reuse - cpu emulation for malware analysis&nbsp;<span>&gt;</span></div>
+    </a>
+    
+</nav>
+</article>
+
+        
+    </section>
+    <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Yev&#39;s security notes&nbsp;
+            Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> with theme <a href="https://github.com/carsonip/hugo-theme-minos">Minos</a>
+        </div>
+    </div>
+    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/tomorrow-night.min.css" integrity="sha256-2wL88NKUqvJi/ExflDzkzUumjUM73mcK2gBvBBeLvTk=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js" integrity="sha256-KbfTjB0WZ8vvXngdpJGY3Yp3xKk+tttbqClO11anCIU=" crossorigin="anonymous"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    
+    <script>
+        document.getElementById('main-nav-toggle').addEventListener('click', function () {
+            var header = document.getElementById('header');
+            if (header.classList.contains('mobile-on')) {
+                header.classList.remove('mobile-on');
+            } else {
+                header.classList.add('mobile-on');
+            }
+        });
+    </script>
+</footer>
+</div>
+</body>
+</html>

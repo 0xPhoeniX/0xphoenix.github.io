@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Portable Network Traffic Capture // Yev&#39;s security notes</title>
+
+        <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+        <meta property="og:title" content="Portable Network Traffic Capture" />
+    <meta property="og:description" content="" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://0xphoenix.github.io/tools/portable-traffic-capture/" />
+    
+
+    <link href="" rel="alternate" type="application/rss+xml" title="Yev&#39;s security notes" />
+    <link rel="shortcut icon" href="/favicon.png">
+
+    <link href="https://0xphoenix.github.iowebfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+    <link href="https://0xphoenix.github.iowebfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="https://0xphoenix.github.iocss/style.css">
+
+    <link href="http://gmpg.org/xfn/11" rel="profile">
+    
+    <meta name="generator" content="Hugo 0.36" />
+</head>
+
+
+<body>
+<div id="container">
+    <header id="header">
+    <div id="header-outer" class="outer">
+        <div id="header-inner" class="inner">
+            <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+            <a id="logo" class="logo-text" href="https://0xphoenix.github.io">Yev&#39;s security notes</a>
+            <nav id="main-nav">
+                
+                <a class="main-nav-link" href="/challenges/">Challenges</a>
+                
+                <a class="main-nav-link" href="/reversing/">Reversings</a>
+                
+                <a class="main-nav-link" href="/tools/">Tools</a>
+                
+            </nav>
+            <nav id="sub-nav">
+                <div id="search-form-wrap">
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+    <section id="main" class="outer">
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        <header class="article-header">
+            <h1 class="article-title" itemprop="name">Portable Network Traffic Capture</h1>
+        </header>
+        
+        <div class="article-meta">
+            <a href="/tools/portable-traffic-capture/" class="article-date">
+                <time datetime='2018-04-01T18:52:01.000-04:00' itemprop="datePublished">2018-04-01</time>
+            </a>
+            
+            
+            <div class="post-categories">
+                <div class="article-category">
+                    
+                    
+                    <a class="article-category-link" href="https://0xphoenix.github.io/categories/tools">Tools</a>
+                    
+                </div>
+            </div>
+            
+            
+        </div>
+        <div class="article-entry" itemprop="articleBody">
+            
+
+<p>Recently,  I found myself in need of SSL traffic analysis coming out of IoT and mobile devices. After some considerations about the setup of monitoring gear I ended up with using Raspberry Pi 3 as a platform for that because most of the devices were with wifi only and I needed something more mobile at hand. There are some guides to set such platform up but I found them lacking certain things that prevented the whole thing from working for me. So, this article is mainly a notes for myself (and may be others) that got everything running smoothly at the end. I also ended up experimenting with Raspi being connected to the Internet through WiFi/Ethernet interfaces. So here I would describe both ways for convinience.</p>
+
+<p>So, here are main solution objectives:</p>
+
+<ul>
+<li>Minimal setup for monitored devices</li>
+<li>Wireless solution</li>
+<li>Portable</li>
+</ul>
+
+<p>and components involved:</p>
+
+<ul>
+<li>Hardware
+
+<ul>
+<li>RasPi 3</li>
+<li>WiFi dongle (optional)</li>
+</ul></li>
+<li>Software
+
+<ul>
+<li>Raspbian, November 2017 version</li>
+<li>hostapd, dnsmasq, iptables, sslstrip, mitmproxy (optional)</li>
+</ul></li>
+</ul>
+
+<h2 id="network-interface-configuration">Network Interface Configuration</h2>
+
+<p>First things first - participating interfaces must be set up. There are several options for that where WiFi hotspot interface (<code>wlan0</code>) is common for devices to connect to and following options for Internet gateway:</p>
+
+<ul>
+<li>Ethernet interface <code>eth0</code> - RasPI has one free port available</li>
+<li>Additional WiFi interface <code>wlan1</code>  - additional doungle must be <a href="https://www.buyapi.ca/product/miniature-wifi-adapter-official-raspberry-pi-edition/">purchased</a>. This would provide a complete wireless monitoring solutions :-)</li>
+</ul>
+
+<p>In both cases  <code>/etc/network/interfaces</code> should be edited accordingly. In case of Internet gateway interface, it&rsquo;s address would be assigned by ISP DHCP server, while WIFi hotspot address must be set manually as this information would be needed during the <code>hostapd</code> setup.</p>
+
+<h4 id="wifi-hotspot-ethernet-internet-interface">WiFi Hotspot + Ethernet Internet interface</h4>
+
+<pre><code>auto eth0
+allow-hotplug eth0
+iface eth0 inet dhcp
+
+allow-hotplug wlan0
+iface wlan0 inet static
+	address   192.168.10.1
+	netmask   255.255.255.0
+	network   192.168.10.0
+	broadcast 192.168.10.255
+</code></pre>
+
+<p>Note: If you like me had problem with <code>eth0</code> interface being renamed to something else, try to fix this by adding <code>net.ifnames=0</code> to <code>/boot/cmdline.txt</code>. This what helped me to fix it.</p>
+
+<h4 id="wifi-hotspot-wifi-internet-interface">WiFi Hotspot + WiFi Internet interface</h4>
+
+<pre><code>auto wlan1
+iface wlan1 inet dhcp
+	wpa-ssid YOUR-SSID-HERE
+	wpa-psk YOUR-PASSWORD-HERE
+
+allow-hotplug wlan0
+iface wlan0 inet static
+    address   192.168.10.1
+    netmask   255.255.255.0
+    network   192.168.10.0
+    broadcast 192.168.10.255
+</code></pre>
+
+<p>It should be noted that <code>wpa_supplicant</code> must be installed beforehead.</p>
+
+<h4 id="local-dhcp-client">Local DHCP client</h4>
+
+<p>To privent collision, WiFi hotspot interface must be excluded from local DHCP client configuration (<code>/etc/dhcpcd.conf</code>) by adding one line at the bottom:</p>
+
+<pre><code>denyinterfaces wlan0
+</code></pre>
+
+<p>And restart the interfaces:</p>
+
+<pre><code class="language-bash">sudo /etc/init.d/networking restart
+</code></pre>
+
+<h2 id="setting-up-access-point">Setting up Access Point</h2>
+
+<p><code>hostapd</code> will be used as AP daemon. So let&rsquo;s install it and prepare configuration file:</p>
+
+<pre><code class="language-bash">sudo apt-get install hostapd
+cd /etc/hostapd/
+sudo cp /usr/share/doc/hostapd/examples/hostapd.conf.gz .
+sudo gunzip ./hostapd.conf.gz
+</code></pre>
+
+<p>Now there are some parameters that must be changed in <code>/etc/hostapd/hostapd.conf</code></p>
+
+<pre><code>interface=wlan0					# AP interface name
+driver=nl80211
+ssid=AP-SSID-HERE				# The name of your new AP
+hw_mode=g
+channel=11					# WiFi transmission channel
+ieee80211n=1
+wmm_enabled=1
+ht_capab=[HT40][SHORT-GI-20][DSSS_CCK-40]
+macaddr_acl=0
+auth_algs=1
+ignore_broadcast_ssid=0
+wpa=2
+wpa_key_mgmt=WPA-PSK
+wpa_passphrase=PASSWORD-HERE			# The password for AP access
+rsn_pairwise=CCMP
+</code></pre>
+
+<p>Next, let&rsquo;s check that the new AP is accessable by starting  <code>hostapd</code> manually:</p>
+
+<pre><code class="language-bash">sudo /usr/sbin/hostapd /etc/hostapd/hostapd.conf
+</code></pre>
+
+<p>You should see the AP by the name that was given in the config file and be able to connect to it with the preconfigured password. Upon success, <code>hostapd</code> should be configured as a service by editing <code>DAEMON_CONF</code> variable in <code>/etc/default/hostapd</code>:</p>
+
+<pre><code>DAEMON_CONF=&quot;/etc/hostapd/hostapd.conf&quot;
+</code></pre>
+
+<p>Now, let&rsquo;s enable <code>hostapd</code> service, start it and check the status:</p>
+
+<pre><code class="language-bash">sudo systemctl enable hostapd.service
+sudo systemctl restart hostapd.service
+sudo systemctl status hostapd.service
+</code></pre>
+
+<h2 id="setting-up-dns-server">Setting up DNS Server</h2>
+
+<p>This setup is using <code>dnsmasq</code> for its DNS server needs. So let&rsquo;s edit <code>/etc/dnsmasq.conf</code>:</p>
+
+<pre><code>interface=wlan0					# AP interface
+bind-interfaces
+server=8.8.8.8					# ISP DNS  server
+domain-needed  
+bogus-priv
+listen-address=192.168.10.1			# The IP of AP interface
+
+# The range must be different from your AP interface network
+dhcp-range=192.168.13.10,192.168.13.240,12h
+</code></pre>
+
+<p>Restart the service and check its status:</p>
+
+<pre><code class="language-bash">sudo systemctl restart dnsmasq
+sudo systemctl status dnsmasq
+</code></pre>
+
+<h2 id="iptables-and-internel-access">IpTables and Internel access</h2>
+
+<p>Let&rsquo;s continue to  enable Internet access for all AP clients. Enable IP forwarding:</p>
+
+<pre><code class="language-bash">sudo sysctl -w net.ipv4.ip_forward=1
+</code></pre>
+
+<p>and make it persist after reboot by edititng <code>/etc/sysctl.conf</code>:</p>
+
+<pre><code>net.ipv4.ip_forward = 1
+</code></pre>
+
+<p>Lastly <code>iptables</code> should take care of traffic routing between AP interface and Internet interface.</p>
+
+<p>For <em>Ethernet option</em>:</p>
+
+<pre><code class="language-bash">sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+sudo iptables -A FORWARD -i eth0 -o wlan0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo iptables -A FORWARD -i wlan0 -o eth0 -j ACCEPT
+</code></pre>
+
+<p>or for <em>WiFi</em> option:</p>
+
+<pre><code class="language-bash">sudo iptables -t nat -A POSTROUTING -o wlan1 -j MASQUERADE
+sudo iptables -A FORWARD -i wlan1 -o wlan0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo iptables -A FORWARD -i wlan0 -o wlan1 -j ACCEPT
+</code></pre>
+
+<p>Save the table rules into a file for persistance:</p>
+
+<pre><code class="language-bash">sudo sh -c &quot;iptables-save &gt; /etc/iptables.rules&quot;
+</code></pre>
+
+<p>And load the rules back again after reboot through adding line in  <code>/etc/network/interfaces</code>:</p>
+
+<pre><code>up iptables-restore &lt; /etc/iptables.rules
+</code></pre>
+
+<p>At this point all AP clients should be able to access Internet without any issues. If you have one, please leave a comment so we can try and resolve it.</p>
+
+<h2 id="traffic-monitoring-preps">Traffic Monitoring preps</h2>
+
+<p>I&rsquo;d like to add several examples of useful tools that should be used with the above setup. Please, take into account that <code>mitmproxy</code> setup regarding traffic redirection doubles the one for <code>SSLsplit</code>. So if you set up <code>SSLsplit</code> forwarding params, you should not be doit anything for <code>mitmproxy</code>. Just reuse the same setup for both tools.</p>
+
+<h3 id="preparations-for-sslsplit">Preparations for SSLsplit</h3>
+
+<p>We will not discuss how to actually use <a href="https://www.roe.ch/SSLsplit">SSLsplit</a> here as there are some good resources already available for that. Instead, let&rsquo;s prepare the environment for its usage.</p>
+
+<p>Install the SSLsplit:</p>
+
+<pre><code class="language-bash">sudo apt install sslsplit
+</code></pre>
+
+<p>SSLsplit needs CA certificate pair to be generated and <code>ca.crt</code> must be <a href="https://support.google.com/nexus/answer/2844832?hl=en">imported</a> into target device root CA certificate trust store:</p>
+
+<pre><code class="language-bash">mkdir -p ssl_monitoring/logdir ssl_monitoring/jaildir
+cd ssl_monitoring
+openssl genrsa -out ca.key 4096
+openssl req -new -x509 -days 1826 -key ca.key -out ca.crt
+</code></pre>
+
+<p>In addition, network traffic must be forwarded to SSLsplit controlled ports for further processing. This setup is needed only once to prepare the <code>iptable</code> rules - restore to the clean table and add <code>sslsplit</code> specifics:</p>
+
+<pre><code class="language-bash">sudo iptables-restore &lt; /etc/iptables.rules
+sudo iptables -t nat -F
+sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080
+sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-ports 8443
+sudo iptables -t nat -A PREROUTING -p tcp --dport 587 -j REDIRECT --to-ports 8443
+sudo iptables -t nat -A PREROUTING -p tcp --dport 465 -j REDIRECT --to-ports 8443
+sudo iptables -t nat -A PREROUTING -p tcp --dport 993 -j REDIRECT --to-ports 8443
+sudo sh -c &quot;iptables-save &gt; ssl_monitoring/iptables.sslsplit&quot;
+</code></pre>
+
+<p>and the next time, when the <code>sslsplit</code> is used, just load the rules before starting to do anything:</p>
+
+<pre><code>sudo iptables-restore &lt; ssl_monitoring/iptables.sslsplit
+</code></pre>
+
+<p>In the above example HTTPS, IMAP (over SSL) and SMTP (over SSL) are forwarded to <code>8443</code> port which is monitored by SSLsplit. In case other ports are needed, they can be added to the <code>iptables</code> in the similar way.</p>
+
+<p>And start SSLsplit for capturing:</p>
+
+<pre><code class="language-bash">sudo sslsplit 
+  -l conn.log 
+  -j jaildir/ 
+  -S logdir/ 
+  -k ca.key 
+  -c ca.crt 
+   ssl 0.0.0.0 8443 
+   tcp 0.0.0.0 8080
+</code></pre>
+
+<p>More information about how to use SSLsplit could be found on its author&rsquo;s <a href="https://www.roe.ch/SSLsplit">site</a>.</p>
+
+<h3 id="preparations-for-mitmproxy">Preparations for MitmProxy</h3>
+
+<p>Install mitmproxy by:</p>
+
+<pre><code class="language-bash">sudo pip3 install mitmproxy
+</code></pre>
+
+<p>and traffic forwarding will be taken care of by <code>iptables</code>.  This setup needs to done only once:</p>
+
+<pre><code class="language-bash">sudo iptables-restore &lt; /etc/iptables.rules
+sudo iptables -t nat -F
+sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080
+sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-ports 8080
+sudo sh -c &quot;iptables-save &gt; ssl_monitoring/iptables.mitmproxy&quot;
+</code></pre>
+
+<p>The final thing is to register mitmproxy as a trusted CA with the target device. (<a href="https://support.google.com/nexus/answer/2844832?hl=en">Android</a>)</p>
+
+<p>From now on, load only the  mitmproxy rules and we are done:</p>
+
+<pre><code>sudo iptables-restore &lt; ssl_monitoring/iptables.mitmproxy
+</code></pre>
+
+<p>Now, let&rsquo;s get some traffic:</p>
+
+<pre><code class="language-bash">sudo mitmproxy --mode transparent
+</code></pre>
+
+<p>If you want to re-use the certs that were generated previously, there is one another thing left to do - generate PEM format of certificate:</p>
+
+<pre><code>cat ca.key ca.crt \&gt; ca.pem
+sudo mitmproxy --mode transparent --certs *=ca.pem
+</code></pre>
+
+<p>That&rsquo;s all folks!</p>
+
+        </div>
+
+        
+        
+        <div class="article-toc" >
+            <h3>Contents</h3>
+            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#network-interface-configuration">Network Interface Configuration</a>
+<ul>
+<li>
+<ul>
+<li><a href="#wifi-hotspot-ethernet-internet-interface">WiFi Hotspot + Ethernet Internet interface</a></li>
+<li><a href="#wifi-hotspot-wifi-internet-interface">WiFi Hotspot + WiFi Internet interface</a></li>
+<li><a href="#local-dhcp-client">Local DHCP client</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#setting-up-access-point">Setting up Access Point</a></li>
+<li><a href="#setting-up-dns-server">Setting up DNS Server</a></li>
+<li><a href="#iptables-and-internel-access">IpTables and Internel access</a></li>
+<li><a href="#traffic-monitoring-preps">Traffic Monitoring preps</a>
+<ul>
+<li><a href="#preparations-for-sslsplit">Preparations for SSLsplit</a></li>
+<li><a href="#preparations-for-mitmproxy">Preparations for MitmProxy</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+        </div>
+        
+        
+
+        
+
+
+        
+        <footer class="article-footer">
+            <ul class="article-tag-list">
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/raspi">raspi
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/ssl-stripping">ssl stripping
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/wifi-monitor">wifi monitor
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/iot">IoT
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/mobile">mobile
+                    </a>
+                </li>
+                
+            </ul>
+        </footer>
+        
+    </div>
+    <nav id="article-nav">
+    
+    
+    <a href="/challenges/flare/flareon_2014_1/" id="article-nav-older" class="article-nav-link-wrap">
+        <div class="article-nav-title">Flare-On 2014 Chellage 1&nbsp;<span>&gt;</span></div>
+    </a>
+    
+</nav>
+</article>
+
+        
+    </section>
+    <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Yev&#39;s security notes&nbsp;
+            Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> with theme <a href="https://github.com/carsonip/hugo-theme-minos">Minos</a>
+        </div>
+    </div>
+    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/tomorrow-night.min.css" integrity="sha256-2wL88NKUqvJi/ExflDzkzUumjUM73mcK2gBvBBeLvTk=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js" integrity="sha256-KbfTjB0WZ8vvXngdpJGY3Yp3xKk+tttbqClO11anCIU=" crossorigin="anonymous"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    
+    <script>
+        document.getElementById('main-nav-toggle').addEventListener('click', function () {
+            var header = document.getElementById('header');
+            if (header.classList.contains('mobile-on')) {
+                header.classList.remove('mobile-on');
+            } else {
+                header.classList.add('mobile-on');
+            }
+        });
+    </script>
+</footer>
+</div>
+</body>
+</html>

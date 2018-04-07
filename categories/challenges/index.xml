@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Challenges on Yev&#39;s security notes</title>
+    <link>https://0xphoenix.github.io/categories/challenges/</link>
+    <description>Recent content in Challenges on Yev&#39;s security notes</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 23 Sep 2014 18:52:01 -0400</lastBuildDate>
+    
+	<atom:link href="https://0xphoenix.github.io/categories/challenges/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Flare-On 2014 Chellage 1</title>
+      <link>https://0xphoenix.github.io/challenges/flare/flareon_2014_1/</link>
+      <pubDate>Tue, 23 Sep 2014 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/challenges/flare/flareon_2014_1/</guid>
+      <description>The binary can be downloaded from the original site. Quick check shows that this is a .NET executable with some humor:
+Using very handy .NET decompiler, ILSpy, let’s check the source of this funny thing with emphasis on the implementation of Decode event handler:
+private void btnDecode_Click(object sender, EventArgs e) { this.pbRoge.Image = Resources.bob_roge; byte[] dat_secret = Resources.dat_secret; string text = &amp;quot;&amp;quot;; for (int i = 0; i &amp;lt; dat_secret.Length; i++) { byte b = dat_secret[i]; text += (char)((b &amp;gt;&amp;gt; 4 | ((int)b &amp;lt;&amp;lt; 4 &amp;amp; 240)) ^ 41); } text += &amp;quot;\0&amp;quot;; string text2 = &amp;quot;&amp;quot;; for (int j = 0; j &amp;lt; text.</description>
+    </item>
+    
+    <item>
+      <title>Flare-On 2014 Chellage 2</title>
+      <link>https://0xphoenix.github.io/challenges/flare/flareon_2014_2/</link>
+      <pubDate>Tue, 23 Sep 2014 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/challenges/flare/flareon_2014_2/</guid>
+      <description>In this one, flare-on.com site was attacked. The attacker left “something” behind for us to investigate. We are getting the snapshot of the site for analysis and the email is somewhere inside:
+After analysis of the original site against the challenge files, the “secret” is found in the image file (flare-on.png) and that is where the “digging” will take place:
+Let’s extract that hidden message for further processing - Stage 0:</description>
+    </item>
+    
+    <item>
+      <title>Flare-On 2014 Chellage 3</title>
+      <link>https://0xphoenix.github.io/challenges/flare/flareon_2014_3/</link>
+      <pubDate>Tue, 23 Sep 2014 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/challenges/flare/flareon_2014_3/</guid>
+      <description>This challenge is about analyzing a binary file. Using IDA. we see here a sort of “obfuscation” where the actual code (payload) is moved into the stack by the loader and executed from there:
+The payload is actually a multi-stage xor based, self decrypting code which in our case has various funny sentences revealed in every decrypted part:
+   Stage Result              I hope, you’ve got the idea here.</description>
+    </item>
+    
+    <item>
+      <title>Flare-On 2014 Chellage 4</title>
+      <link>https://0xphoenix.github.io/challenges/flare/flareon_2014_4/</link>
+      <pubDate>Tue, 23 Sep 2014 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/challenges/flare/flareon_2014_4/</guid>
+      <description>In this task, there is a PDF file only. The first thought that crossed my mind was that there is some kind of exploit embedded in it. Let’s analyze the file to see what secrets it got hidden. There are several ways to do it: online resources (wepwet) or local. I’ll use the later as online will do most of work for you and you will miss all the fun and knowledge.</description>
+    </item>
+    
+    <item>
+      <title>Flare-On 2014 Chellage 5</title>
+      <link>https://0xphoenix.github.io/challenges/flare/flareon_2014_5/</link>
+      <pubDate>Tue, 23 Sep 2014 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/challenges/flare/flareon_2014_5/</guid>
+      <description>This one starts the series of more challenging puzzles. The binary is actually a key logger with a twist, writing every pressed key into a log file.
+Fig. 1
+It will try to install itself in your system under %SystemRoot% by disguising as svchost.dll. It will also add itself under Run key to ensure persistence (boring). The interesting things are waiting for us latter on.
+As I mentioned previously, this key-logger has a twist – each key press is monitored by GetAsyncKeyState which is running in the loop.</description>
+    </item>
+    
+    <item>
+      <title>Flare-On 2014 Chellage 6</title>
+      <link>https://0xphoenix.github.io/challenges/flare/flareon_2014_6/</link>
+      <pubDate>Tue, 23 Sep 2014 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/challenges/flare/flareon_2014_6/</guid>
+      <description>Challenge #6, probably the most toughest task among the series. We are blessed with 64 bit statically linked ELF file with stripped symbols. During the challenge we will be using the following tools:
+ radare2 IDA gdb  First things, first Let’s execute the file (in VM of course) and see what will be the output (if any):
+[test ~]$ ./c6 no  Not much, but it’s a start. This no will be our anchor and starting point in a minute.</description>
+    </item>
+    
+  </channel>
+</rss>

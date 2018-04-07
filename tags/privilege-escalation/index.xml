@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Privilege Escalation on Yev&#39;s security notes</title>
+    <link>https://0xphoenix.github.io/tags/privilege-escalation/</link>
+    <description>Recent content in Privilege Escalation on Yev&#39;s security notes</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 22 Jul 2014 18:52:01 -0400</lastBuildDate>
+    
+	<atom:link href="https://0xphoenix.github.io/tags/privilege-escalation/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Necurs Kit Privilege Escalation Study</title>
+      <link>https://0xphoenix.github.io/reversing/necurs_study/</link>
+      <pubDate>Tue, 22 Jul 2014 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/reversing/necurs_study/</guid>
+      <description>Recently there were several new posts (FSecure Post and Peter Ferrie) about updates to the Necurs malicious kit which in essence is based on the malicious driver with sole purpose to protect other malware from security products. The updated version is now shipped as an embedded self-contained launch-and-forget shellcode which will drop the appropriate driver according to the underlingg OS and on successful deployment will start immediate protection. The authors of the kit will supply the client several APIs that could be used to operate the driver.</description>
+    </item>
+    
+  </channel>
+</rss>

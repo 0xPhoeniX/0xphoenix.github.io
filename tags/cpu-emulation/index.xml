@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Cpu Emulation on Yev&#39;s security notes</title>
+    <link>https://0xphoenix.github.io/tags/cpu-emulation/</link>
+    <description>Recent content in Cpu Emulation on Yev&#39;s security notes</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 28 Dec 2012 18:52:01 -0400</lastBuildDate>
+    
+	<atom:link href="https://0xphoenix.github.io/tags/cpu-emulation/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Malware reuse - cpu emulation for malware analysis</title>
+      <link>https://0xphoenix.github.io/reversing/cpu_emulation_for_malware_analysis/</link>
+      <pubDate>Fri, 28 Dec 2012 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/reversing/cpu_emulation_for_malware_analysis/</guid>
+      <description>During any RE project, precise goal definition is one of the most important steps, without which the project will most likely fail. And I’m not even talking about how time consuming it could be, as frequently I can find the rabbit hole but I’m not really aware how deep it goes. The context for the whole post is RE of malicious software and here I’d like to talk a little bit about the way to put some of the work on the shoulders of the malware itself and still be able to concentrate on the main goals.</description>
+    </item>
+    
+  </channel>
+</rss>

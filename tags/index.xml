@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Yev&#39;s security notes</title>
+    <link>https://0xphoenix.github.io/tags/</link>
+    <description>Recent content in Tags on Yev&#39;s security notes</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 01 Aug 2012 18:52:01 -0400</lastBuildDate>
+    
+	<atom:link href="https://0xphoenix.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Banker</title>
+      <link>https://0xphoenix.github.io/tags/banker/</link>
+      <pubDate>Wed, 01 Aug 2012 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/tags/banker/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Challenge</title>
+      <link>https://0xphoenix.github.io/tags/challenge/</link>
+      <pubDate>Tue, 23 Sep 2014 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/tags/challenge/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Cpu Emulation</title>
+      <link>https://0xphoenix.github.io/tags/cpu-emulation/</link>
+      <pubDate>Fri, 28 Dec 2012 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/tags/cpu-emulation/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Dga</title>
+      <link>https://0xphoenix.github.io/tags/dga/</link>
+      <pubDate>Wed, 01 Aug 2012 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/tags/dga/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Exploitation</title>
+      <link>https://0xphoenix.github.io/tags/exploitation/</link>
+      <pubDate>Tue, 22 Jul 2014 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/tags/exploitation/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Flare On</title>
+      <link>https://0xphoenix.github.io/tags/flare-on/</link>
+      <pubDate>Tue, 23 Sep 2014 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/tags/flare-on/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Iot</title>
+      <link>https://0xphoenix.github.io/tags/iot/</link>
+      <pubDate>Sun, 01 Apr 2018 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/tags/iot/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Malware Analysis</title>
+      <link>https://0xphoenix.github.io/tags/malware-analysis/</link>
+      <pubDate>Tue, 22 Jul 2014 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/tags/malware-analysis/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Malware Reuse</title>
+      <link>https://0xphoenix.github.io/tags/malware-reuse/</link>
+      <pubDate>Fri, 28 Dec 2012 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/tags/malware-reuse/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Memory Analysis</title>
+      <link>https://0xphoenix.github.io/tags/memory-analysis/</link>
+      <pubDate>Sun, 07 Oct 2012 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/tags/memory-analysis/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Mobile</title>
+      <link>https://0xphoenix.github.io/tags/mobile/</link>
+      <pubDate>Sun, 01 Apr 2018 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/tags/mobile/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Necurs</title>
+      <link>https://0xphoenix.github.io/tags/necurs/</link>
+      <pubDate>Tue, 22 Jul 2014 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/tags/necurs/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Privilege Escalation</title>
+      <link>https://0xphoenix.github.io/tags/privilege-escalation/</link>
+      <pubDate>Tue, 22 Jul 2014 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/tags/privilege-escalation/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Raspi</title>
+      <link>https://0xphoenix.github.io/tags/raspi/</link>
+      <pubDate>Sun, 01 Apr 2018 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/tags/raspi/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Reversing</title>
+      <link>https://0xphoenix.github.io/tags/reversing/</link>
+      <pubDate>Tue, 23 Sep 2014 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/tags/reversing/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Ssl Stripping</title>
+      <link>https://0xphoenix.github.io/tags/ssl-stripping/</link>
+      <pubDate>Sun, 01 Apr 2018 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/tags/ssl-stripping/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Static Analysis</title>
+      <link>https://0xphoenix.github.io/tags/static-analysis/</link>
+      <pubDate>Sun, 07 Oct 2012 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/tags/static-analysis/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Volatility</title>
+      <link>https://0xphoenix.github.io/tags/volatility/</link>
+      <pubDate>Sun, 07 Oct 2012 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/tags/volatility/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Wifi Monitor</title>
+      <link>https://0xphoenix.github.io/tags/wifi-monitor/</link>
+      <pubDate>Sun, 01 Apr 2018 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/tags/wifi-monitor/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

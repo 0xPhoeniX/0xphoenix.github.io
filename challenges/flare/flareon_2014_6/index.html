@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flare-On 2014 Chellage 6 // Yev&#39;s security notes</title>
+
+        <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+        <meta property="og:title" content="Flare-On 2014 Chellage 6" />
+    <meta property="og:description" content="" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://0xphoenix.github.io/challenges/flare/flareon_2014_6/" />
+    
+
+    <link href="" rel="alternate" type="application/rss+xml" title="Yev&#39;s security notes" />
+    <link rel="shortcut icon" href="/favicon.png">
+
+    <link href="https://0xphoenix.github.iowebfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+    <link href="https://0xphoenix.github.iowebfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="https://0xphoenix.github.iocss/style.css">
+
+    <link href="http://gmpg.org/xfn/11" rel="profile">
+    
+    <meta name="generator" content="Hugo 0.36" />
+</head>
+
+
+<body>
+<div id="container">
+    <header id="header">
+    <div id="header-outer" class="outer">
+        <div id="header-inner" class="inner">
+            <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+            <a id="logo" class="logo-text" href="https://0xphoenix.github.io">Yev&#39;s security notes</a>
+            <nav id="main-nav">
+                
+                <a class="main-nav-link" href="/challenges/">Challenges</a>
+                
+                <a class="main-nav-link" href="/reversing/">Reversings</a>
+                
+                <a class="main-nav-link" href="/tools/">Tools</a>
+                
+            </nav>
+            <nav id="sub-nav">
+                <div id="search-form-wrap">
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>
+    <section id="main" class="outer">
+        <article class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        <header class="article-header">
+            <h1 class="article-title" itemprop="name">Flare-On 2014 Chellage 6</h1>
+        </header>
+        
+        <div class="article-meta">
+            <a href="/challenges/flare/flareon_2014_6/" class="article-date">
+                <time datetime='2014-09-23T18:52:01.000-04:00' itemprop="datePublished">2014-09-23</time>
+            </a>
+            
+            
+            <div class="post-categories">
+                <div class="article-category">
+                    
+                    
+                    <a class="article-category-link" href="https://0xphoenix.github.io/categories/challenges">Challenges</a>
+                    
+                </div>
+            </div>
+            
+            
+        </div>
+        <div class="article-entry" itemprop="articleBody">
+            
+
+<p>Challenge #6, probably the most toughest task among the series. We are blessed with 64 bit statically linked ELF file with stripped symbols. During the challenge we will be using the following tools:</p>
+
+<ul>
+<li>radare2</li>
+<li>IDA</li>
+<li>gdb</li>
+</ul>
+
+<h3 id="first-things-first">First things, first</h3>
+
+<p>Let’s execute the file (in VM of course) and see what will be the output (if any):</p>
+
+<pre><code>[test ~]$ ./c6
+no
+</code></pre>
+
+<p>Not much, but it’s a start. This <code>no</code> will be our anchor and starting point in a minute.</p>
+
+<p>Before continuing further I’d like to take a look statically on the binary. As already mentioned, the file comes with striped symbols, meaning we have no straight forward clues left for us. To continue, one needs to find the <code>main</code>function as this is the code to start from. Entry point of the execution, in most cases, will start from bootstrapping code which will prepare the environment for the programmer’s code to run. The preparation process is managed by <code>__libc_start_main</code> function with the following interface:</p>
+
+<pre><code>int __libc_start_main(int (*main) (...), 
+			int argc, 
+			char * * ubp_av, 
+			void (*init) (void), 
+			void (*fini) (void), 
+			void (*rtld_fini) (void), 
+			void (* stack_end));
+</code></pre>
+
+<p>The first parameter here is the pointer to the <code>main</code> function and now, fire up <code>radare2</code> and let’s do some actual examinations. <code>radare2</code> is able to identify <code>main</code> function during code analysis stage.</p>
+
+<pre><code>[0x00401058]&gt; aa                               ; whole program analysis
+[0x00401058]&gt; pdf                               ; disassemble function
+/ (fcn) entry0 67
+|          0x00401058    31ed         xor ebp, ebp
+|          0x0040105a    4989d1       mov r9, rdx
+|          0x0040105d    5e           pop rsi
+|          0x0040105e    4889e2       mov rdx, rsp
+|          0x00401061    4883e4f0     and rsp, 0xfffffffffffffff0
+|          0x00401065    50           push rax
+|          0x00401066    54           push rsp
+|          0x00401067    49c7c040e64. mov r8, 0x45e640 ;  0x0045e640
+|          0x0040106e    48c7c1b0e54. mov rcx, 0x45e5b0 ;  0x0045e5b0
+|          0x00401075    48c7c7e1dc4. mov rdi, main ;  0x0045dce1
+|          0x0040107c    e88fcc0500   call __libc_start_main
+|             __libc_start_main(unk, unk) ; main+47
+|          0x00401081    f4           hlt
+|          0x00401082    90           nop
+|          0x00401083    90           nop
+           ; CODE (CALL) XREF from 0x004002fc (fcn.004002f8)
+/ (fcn) fcn.00401084 23
+|          0x00401084    4883ec08     sub rsp, 0x8
+|          0x00401088    488b05496f3. mov rax, [rip+0x326f49] ;  0x00407fd8
+|          0x0040108f    4885c0       test rax, rax
+|          0x00401092    7402         je 0x401096
+|          0x00401094    ffd0         call rax
+|             0x00000000()
+|          0x00401096    4883c408     add rsp, 0x8
+\          0x0040109a    c3           ret
+</code></pre>
+
+<p>So, knowing that it’s 64 bit executable with appropriate <a href="http://en.wikipedia.org/wiki/X86_calling_conventions#x86-64_calling_conventions">ABI</a>, we’d expect the <code>main</code> function be passed in <code>RDI</code>register and <code>radare2</code> indeed supports the assumption.</p>
+
+<h3 id="overview-of-the-binary">Overview of the binary</h3>
+
+<p>The binary is heavily obfuscated with a lot of junk instructions and spaghetti code which makes it in general not *user*friendly. On the figure, you are seeing starting function and <em>yes</em>, this is one function where even IDA complained about amount of nodes being more that 1000. Further analysis showed that most of the code is in the same <em>unfriendly</em> condition.</p>
+
+<p><img src="/images/flare_ch6_main_graph.png" alt="img" /></p>
+
+<p>Fig. 1</p>
+
+<p>As you can see, it’s easy to get lost, but still let’s dive in for a while. Let’s start randomly examine various parts of the function and look for <em>something</em>. After some time, reoccurring patterns start to appear which are different from other junk code.</p>
+
+<p><img src="/images/flare_ch6_generating_message.png" alt="img" /></p>
+
+<p>Fig. 2</p>
+
+<p>Various constants are getting updated with first letters of some predefined words and this was happening all over the place. Constant’s examination showed interesting thing, all of them are actually cells of a static array.</p>
+
+<p><img src="/images/flare_ch6_message_array.png" alt="img" /></p>
+
+<p>Fig. 3</p>
+
+<p>References to most of them showed the same update pattern:</p>
+
+<p><img src="/images/flare_ch6_refs.png" alt="img" /></p>
+
+<p>Fig. 4</p>
+
+<p>Intuitively, let’s examine the head of the array to check whether it’s referenced anywhere that could be of any interest.</p>
+
+<p><img src="/images/flare_ch6_bingo.png" alt="img" /></p>
+
+<p>Fig. 5</p>
+
+<p>Before moving to the dynamic part of the challenge, some of you have spotted the <strong>bingo</strong> point (as I call it). It looks, that the constant array is actually an obfuscated <strong>shellcode</strong> which will be executed at the end. Currently it’s not interesting to understanding what type of obfuscation was used. Now, I hope the general idea is clear and I’d like to sum things up, before moving on to actually verifying all the theories:</p>
+
+<ul>
+<li>The binary is hardened with spaghetti and junk code</li>
+<li>During the execution, static array is filled with first letters of the predefined words</li>
+<li>Eventually the array will be do-obfuscated and executed – this is an educated guess which will be checked during binary execution</li>
+</ul>
+
+<p>So now, (hopefully) you understand a little bit what is going on. At the next step, <code>gdb</code> will be use as primary tool to solve the challenge and IDA will accompany us on the way. The author left numerous clues to be used and help us get to the end. The first one is the <code>no</code> message which appeared at the start.</p>
+
+<hr />
+
+<p>The goal is to breakpoint on <code>loc_44BAB9</code> (Fig. 5) and get to shellcode execution.</p>
+
+<hr />
+
+<h3 id="clue-no">Clue <em>-=no=-</em></h3>
+
+<pre><code>gdb$ run
+Starting program: ~~~~~~~~~./c6
+Got object file from memory but can't read symbols: File truncated.
+no
+[Inferior 1 (process 453) exited with code 064]
+...
+gdb$
+</code></pre>
+
+<p>Finding <code>no</code> in IDA. Analyzing the chain on (Fig. 6) one can immediately see, that there were not enough arguments given on start up. There is still no information what should be supplied, but this will definitely get there. So, let’s restart with one arguments and follow the results.</p>
+
+<p><img src="/images/flare_ch6_no_anchor.png" alt="img" /></p>
+
+<p>Fig. 6</p>
+
+<h3 id="clues-na-and-stahp">Clues <em>-=na=-</em> and <em>-=stahp=-</em></h3>
+
+<pre><code>gdb$ run bla
+Starting program: ~~~~~~~~~./c6 bla
+Got object file from memory but can't read symbols: File truncated.
+na
+[Inferior 1 (process 447) exited with code 0247]
+...
+gdb$
+</code></pre>
+
+<p>This time we explore the previous finding, where on error, the message was printed with <code>print</code> (Fig. 6). Using IDA’s xRef feature, we got the explanation for the <code>na</code> – this also shows insufficient parameters (Fig. 7) we supplied, so another one is needed.</p>
+
+<p><img src="/images/flare_ch6_na_anchor.png" alt="img" /></p>
+
+<p>Fig. 7</p>
+
+<p>Just to check how many parameters there actually are, try to add more than two and it always will generate :</p>
+
+<pre><code>gdb$ run bla foo vvv
+Starting program: ~~~~~~~~~./c6 4815162342 bbb vvv
+Got object file from memory but can't read symbols: File truncated.
+stahp
+[Inferior 1 (process 583) exited with code 016]
+
+gdb$ run bla foo vvv zzz
+Starting program: ~~~~~~~~~./c6 4815162342 bbb vvv
+Got object file from memory but can't read symbols: File truncated.
+stahp
+[Inferior 1 (process 583) exited with code 016]
+</code></pre>
+
+<p>and code confirmation:</p>
+
+<p><img src="/images/flare_ch6_num_of_params.png" alt="img" /></p>
+
+<p>So, there are only 2 parameters to work with.</p>
+
+<h3 id="some-anti-debugging">Some anti-Debugging</h3>
+
+<p>Adding two parameters, got us to the next <em>trouble</em>:</p>
+
+<pre><code>gdb$ run bla foo
+Starting program: ~~~~~~~~~./c6 bla foo
+Got object file from memory but can't read symbols: File truncated.
+Program received signal SIGSEGV, Segmentation fault
+[Inferior 1 (process 457) exited with code 051]
+…
+gdb$
+</code></pre>
+
+<p>Let’s try once again and check why we got this output (Fig. 8) by using the Xref for <code>print</code> function.</p>
+
+<p><img src="/images/flare_ch6_ptrace.png" alt="img" /></p>
+
+<p>Fig. 8</p>
+
+<p>What we have here is actually a <code>ptrace</code> (<a href="http://blog.rchapman.org/post/36801038863/linux-system-call-table-for-x86-64">0x65 system call</a>) call with <code>PTRACE_TRACEME</code> request.</p>
+
+<pre><code>PTRACE_TRACEME
+    Indicate that this process is to be traced by its parent. 
+    (pid, addr, and data are ignored.)
+</code></pre>
+
+<p><img src="/images/flare_ch6_ptrace_call.png" alt="img" /></p>
+
+<p>As you probably understood, current process is already traced by parent (<code>gdb</code>), so the new call to <code>ptrace</code> will result in failure. The solution for this trick is actually quiet easy, just overwrite <code>set $EAX = 1</code> after return from <code>ptrace</code> or patch <code>jz short loc_41f232</code> (Fig. 8) to <code>jmp short loc_41f232</code> with your favorite hex editor. Assuming that this <em>trouble</em> was solved, let’s continue.</p>
+
+<h3 id="clue-bad">Clue <em>-=bad=-</em></h3>
+
+<p>So, now we know that the application expects 2 arguments and was protected with anti-debugging. We continue now with the following:</p>
+
+<pre><code>gdb$ run bla foo
+Starting program: ~~~~~~~~~./c6 bla foo
+Got object file from memory but can't read symbols: File truncated.
+bad
+[Inferior 1 (process 488) exited with code 0244]
+...
+gdb$
+</code></pre>
+
+<p>Repeating the previous technique, it could be seen (Fig. 9) that some buffer is compared to <code>bngcg</code>debd`.</p>
+
+<p><img src="/images/flare_ch6_1param_check.png" alt="img" /></p>
+
+<p>Fig. 9</p>
+
+<p>Backtracking, leads to the fact , that the first parameter is actually <code>xor’ed</code> with <code>V</code> and stored in <code>buffer</code> before checking with <code>bngcg</code>debd`.</p>
+
+<p><img src="/images/flare_ch6_1param_check_b.png" alt="img" /></p>
+
+<p>Fig. 10</p>
+
+<p>To reveal the first parameter, let’s <code>XOR</code> the <code>bngcg</code>debd<code>with</code>V<code>and get</code>4815162342`.</p>
+
+<h3 id="sleeping">Sleeping</h3>
+
+<p>Once the application re-executed with new parameter, it freezes. Breaking in <code>gdb</code> reveals the issue.</p>
+
+<pre><code>gdb$ run 4815162342 foo
+Starting program: ~~~~~~~~~./c6 4815162342 foo
+Got object file from memory but can't read symbols: File truncated.
+^C
+Program received signal SIGINT, Interrupt.
+-----------------------------------------------------------------------------------------------------------------------[regs]
+  RAX: 0xFFFFFFFFFFFFFDFC  RBX: 0x00007FFFFFFFDD50  RCX: 0xFFFFFFFFFFFFFFFF  RDX: 0x0000000000000000  o d I t s Z a P c
+  RSI: 0x00007FFFFFFFDE50  RDI: 0x00007FFFFFFFDE50  RBP: 0x00000000FFFFFFFF  RSP: 0x00007FFFFFFFDCA8  RIP: 0x0000000000473D50
+  R8 : 0x00007FFFFFFFDCB0  R9 : 0x0000000000000003  R10: 0x0000000000000008  R11: 0x0000000000000246  R12: 0x000000000045E5B0
+  R13: 0x0000000000000000  R14: 0x0000000000000000  R15: 0x0000000000000000
+  CS: 0033  DS: 0000  ES: 0000  FS: 0063  GS: 0000  SS: 002B
+-----------------------------------------------------------------------------------------------------------------------[code]
+=&gt; 0x473d50: cmp    rax,0xfffffffffffff001
+   0x473d56: jae    0x476c30
+   0x473d5c: ret
+   0x473d5d: sub    rsp,0x8
+   0x473d61: call   0x475940
+   0x473d66: mov    QWORD PTR [rsp],rax
+   0x473d6a: mov    eax,0x23
+   0x473d6f: syscall
+</code></pre>
+
+<p><a href="http://blog.rchapman.org/post/36801038863/linux-system-call-table-for-x86-64">0x23 system call</a> is actually <code>nanosleep</code> which is called from within <code>sub_473B70</code>. Sleeping is easily neutralized by supplying small sleep time.</p>
+
+<p><img src="/images/flare_ch6_changing_sleep_time.png" alt="img" /></p>
+
+<p>Fig. 11</p>
+
+<h3 id="shellcode">Shellcode</h3>
+
+<p>Finally, after all the adventures, <code>gdb</code> stopped on <code>0x44bab9</code> – just before decoding the static array with presumable shellcode.</p>
+
+<p><img src="/images/flare_ch6_predecode.png" alt="img" /></p>
+
+<p>The contents of the array @ <code>0x729900</code> are likely to be base64 encoded (I did not find the need to check the algo). After the decoding, the following shellcode will be executed (only part of it is show here).</p>
+
+<p><img src="/images/flare_ch6_checking_2nd_param_ida.png" alt="img" /></p>
+
+<p>The idea here is to take the obfuscation algorithm and execute it backwards with the help of the pen or <code>python</code>. It’s not very complex, so I leave it for you to implement. If everything is done right, you will get the following mail:</p>
+
+<p><center><strong>l1nhax.hurt.u5.a1l@flare-on.com</strong></center></p>
+
+<h3 id="bonus-back-connect-code">Bonus – back-connect code</h3>
+
+<p>As a bonus, the author left for us some back-connect code, sort of a prize as it will be activated only when the right 2nd parameter was supplied (which is the email).</p>
+
+<p><img src="/images/flare_ch6_backconnect.png" alt="img" /></p>
+
+<p>Fig. 12 – back-connect code or <a href="http://packetstormsecurity.com/files/97746/FreeBSD-x86-Connect-Back-Shellcode.html">here</a></p>
+
+<p>This how it looks when executed:</p>
+
+<p><img src="/images/flare_ch6_backconnect_on.png" alt="img" /></p>
+
+<p>So be careful and always use a controlled (to some degree) environment!!!</p>
+
+        </div>
+
+        
+        
+        <div class="article-toc" >
+            <h3>Contents</h3>
+            <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#first-things-first">First things, first</a></li>
+<li><a href="#overview-of-the-binary">Overview of the binary</a></li>
+<li><a href="#clue-no">Clue <em>-=no=-</em></a></li>
+<li><a href="#clues-na-and-stahp">Clues <em>-=na=-</em> and <em>-=stahp=-</em></a></li>
+<li><a href="#some-anti-debugging">Some anti-Debugging</a></li>
+<li><a href="#clue-bad">Clue <em>-=bad=-</em></a></li>
+<li><a href="#sleeping">Sleeping</a></li>
+<li><a href="#shellcode">Shellcode</a></li>
+<li><a href="#bonus-back-connect-code">Bonus – back-connect code</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+        </div>
+        
+        
+
+        
+
+
+        
+        <footer class="article-footer">
+            <ul class="article-tag-list">
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/reversing">reversing
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/challenge">challenge
+                    </a>
+                </li>
+                
+                <li class="article-tag-list-item">
+                    <a class="article-tag-list-link" href="https://0xphoenix.github.io/tags/flare-on">Flare-On
+                    </a>
+                </li>
+                
+            </ul>
+        </footer>
+        
+    </div>
+    <nav id="article-nav">
+    
+    <a href="/challenges/flare/flareon_2014_5/" id="article-nav-newer" class="article-nav-link-wrap">
+        <div class="article-nav-title"><span>&lt;</span>&nbsp;
+            Flare-On 2014 Chellage 5
+        </div>
+    </a>
+    
+    
+    <a href="/reversing/necurs_study/" id="article-nav-older" class="article-nav-link-wrap">
+        <div class="article-nav-title">Necurs Kit Privilege Escalation Study&nbsp;<span>&gt;</span></div>
+    </a>
+    
+</nav>
+</article>
+
+        
+    </section>
+    <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Yev&#39;s security notes&nbsp;
+            Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> with theme <a href="https://github.com/carsonip/hugo-theme-minos">Minos</a>
+        </div>
+    </div>
+    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/tomorrow-night.min.css" integrity="sha256-2wL88NKUqvJi/ExflDzkzUumjUM73mcK2gBvBBeLvTk=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js" integrity="sha256-KbfTjB0WZ8vvXngdpJGY3Yp3xKk+tttbqClO11anCIU=" crossorigin="anonymous"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    
+    <script>
+        document.getElementById('main-nav-toggle').addEventListener('click', function () {
+            var header = document.getElementById('header');
+            if (header.classList.contains('mobile-on')) {
+                header.classList.remove('mobile-on');
+            } else {
+                header.classList.add('mobile-on');
+            }
+        });
+    </script>
+</footer>
+</div>
+</body>
+</html>

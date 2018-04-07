@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Volatility on Yev&#39;s security notes</title>
+    <link>https://0xphoenix.github.io/tags/volatility/</link>
+    <description>Recent content in Volatility on Yev&#39;s security notes</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 07 Oct 2012 18:52:01 -0400</lastBuildDate>
+    
+	<atom:link href="https://0xphoenix.github.io/tags/volatility/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Banker Challenge - another solution</title>
+      <link>https://0xphoenix.github.io/reversing/banker_challenge_static/</link>
+      <pubDate>Sun, 07 Oct 2012 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/reversing/banker_challenge_static/</guid>
+      <description>In my last post I presented a malware analysis solely based on the dynamic technique using OllyDbg. The goal was to recover the algorithm that was used for domain name generation of the C&amp;amp;C server. Knowing, that there is no one best tool for everything but rather the best tool for a particular problem, I’ve decided to try and solve the same challenge with the help from static analysis tools, like IDA (free edition), while minimizing Olly involvement.</description>
+    </item>
+    
+  </channel>
+</rss>

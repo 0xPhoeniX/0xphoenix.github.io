@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Wifi Monitor on Yev&#39;s security notes</title>
+    <link>https://0xphoenix.github.io/tags/wifi-monitor/</link>
+    <description>Recent content in Wifi Monitor on Yev&#39;s security notes</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 01 Apr 2018 18:52:01 -0400</lastBuildDate>
+    
+	<atom:link href="https://0xphoenix.github.io/tags/wifi-monitor/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Portable Network Traffic Capture</title>
+      <link>https://0xphoenix.github.io/tools/portable-traffic-capture/</link>
+      <pubDate>Sun, 01 Apr 2018 18:52:01 -0400</pubDate>
+      
+      <guid>https://0xphoenix.github.io/tools/portable-traffic-capture/</guid>
+      <description>Recently, I found myself in need of SSL traffic analysis coming out of IoT and mobile devices. After some considerations about the setup of monitoring gear I ended up with using Raspberry Pi 3 as a platform for that because most of the devices were with wifi only and I needed something more mobile at hand. There are some guides to set such platform up but I found them lacking certain things that prevented the whole thing from working for me.</description>
+    </item>
+    
+  </channel>
+</rss>
